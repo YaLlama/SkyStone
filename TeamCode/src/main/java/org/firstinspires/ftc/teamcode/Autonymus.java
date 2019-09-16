@@ -139,19 +139,32 @@ public class Autonymus extends LinearOpMode {
         resetEncoders(motorBackRight);
         resetEncoders(motorBackLeft);
 
-        //setting max speed
-        //
-        //
-        //
+        motorFrontLeft.setPower(0);
+        motorFrontRight.setPower(0);
+        motorBackRight.setPower(0);
+        motorBackLeft.setPower(0);
     }
 
     public void testEncoders() {
         //print out encoder value for set time
         int i = 0;
+
+        //tell motors to float
+        motorBackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        motorBackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        motorFrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        motorFrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
         while (i < 10000000) {
             System.out.println(motorBackLeft.getCurrentPosition() + " " + motorBackRight.getCurrentPosition() + " " + motorFrontLeft.getCurrentPosition() + " " + motorFrontRight.getCurrentPosition());
             i++;
         }
+        //lock motos
+        motorBackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motorBackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motorFrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motorFrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         resetEncoders(motorFrontRight);
         resetEncoders(motorFrontLeft);
         resetEncoders(motorBackRight);
