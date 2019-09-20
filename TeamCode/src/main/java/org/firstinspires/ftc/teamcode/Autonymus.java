@@ -3,6 +3,9 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
+import java.lang.*;
 
 
 
@@ -10,6 +13,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 @Autonomous(name="Autonymus")
 public class Autonymus extends LinearOpMode {
+
+
     //VARIABLES
     //
     //
@@ -18,34 +23,37 @@ public class Autonymus extends LinearOpMode {
 
     //location ,location, location
     //robot staring location
-    int robotX = 100;
-    int robotY = 0;
+    private int robotX = 0;
+    private int robotY = 0;
     //robot direction facing
-    int direction = 0;
+    private int direction = 0;
 
     //declaring motors
-    DcMotor motorFrontRight = null;
-    DcMotor motorFrontLeft = null;
-    DcMotor motorBackRight = null;
-    DcMotor motorBackLeft = null;
+    private DcMotor rightFront;
+    private DcMotor leftFront;
+    private DcMotor rightBack;
+    private DcMotor leftBack;
 
     //ticks per revolution
     static final double MOTOR_TICK_COUNT = 537.6;
 
-    //wheel diameter
-    static final int WHEEL_DIAMETER = 8;
+    //wheel diameter cm
+    static final int WHEEL_DIAMETER = 10;
 
-    //circumfrance of wheels in centimeters
+    //circumference of wheels in centimeters
     static final double WHEEL_CIRCUMFRENCE = Math.PI * WHEEL_DIAMETER;
 
-    //Bot radious as in distance from center point to wheels
+    //Bot radius as in distance from center point to wheels
     static final int ROBOT_RADIOUS = 16;
 
     //Power limit
-    static final int POWER_FACTOR = 1;
+    static final double POWER_FACTOR = .3;
 
-    //number of rotations of wheels for the robot to move the circumfarance of the wheel 45degrees
+    //number of rotations of wheels to move wheel (circumference) at 45degree strafe
     static final int STRAFE_FACTOR = 2;
+
+    //gear ratio
+    static final double GEER_RATIO = 4/3;
 
 
     //SHORTCUTS
@@ -55,52 +63,45 @@ public class Autonymus extends LinearOpMode {
     //
 
     public int distanceToTics(double d) {
-        //d is centimers want to travel
-        return (int) (d / WHEEL_CIRCUMFRENCE * MOTOR_TICK_COUNT);
+        //d is centimeters want to travel
+        return (int) (d / WHEEL_CIRCUMFRENCE * MOTOR_TICK_COUNT * GEER_RATIO);
     }
 
 
-    public boolean motorsRunning() {
-        if (motorFrontLeft.isBusy() && motorFrontRight.isBusy() && motorBackLeft.isBusy() && motorBackRight.isBusy()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     public void rotate(int degrees) {
         //rotates robot specific degrees requested
 
         double ditsagacne = ROBOT_RADIOUS * 2 * Math.PI * degrees / 360;
 
-        motorFrontLeft.setTargetPosition((int) ditsagacne * STRAFE_FACTOR);
-        motorFrontRight.setTargetPosition((int) ditsagacne * STRAFE_FACTOR);
-        motorBackRight.setTargetPosition((int) ditsagacne * STRAFE_FACTOR);
-        motorBackLeft.setTargetPosition((int) ditsagacne * STRAFE_FACTOR);
+        leftFront.setTargetPosition((int) ditsagacne * STRAFE_FACTOR);
+        rightFront.setTargetPosition((int) ditsagacne * STRAFE_FACTOR);
+        rightBack.setTargetPosition((int) ditsagacne * STRAFE_FACTOR);
+        leftBack.setTargetPosition((int) ditsagacne * STRAFE_FACTOR);
 
-        motorFrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        motorFrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        motorBackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        motorBackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        motorFrontLeft.setPower(POWER_FACTOR);
-        motorFrontRight.setPower(POWER_FACTOR);
-        motorBackRight.setPower(POWER_FACTOR);
-        motorBackLeft.setPower(POWER_FACTOR);
+        leftFront.setPower(POWER_FACTOR);
+        rightFront.setPower(POWER_FACTOR);
+        rightBack.setPower(POWER_FACTOR);
+        leftBack.setPower(POWER_FACTOR);
 
-        while (motorsRunning()) {
+        while (leftFront.isBusy() && rightFront.isBusy() && leftBack.isBusy() && rightBack.isBusy()) {
 
         }
 
-        motorFrontLeft.setPower(0);
-        motorFrontRight.setPower(0);
-        motorBackRight.setPower(0);
-        motorBackLeft.setPower(0);
+        leftFront.setPower(0);
+        rightFront.setPower(0);
+        rightBack.setPower(0);
+        leftBack.setPower(0);
 
-        motorFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         direction = direction + degrees;
         while (direction < 0 || 360 < direction) {
@@ -119,53 +120,120 @@ public class Autonymus extends LinearOpMode {
 
     public void initalize() {
         //declaring motors
-        DcMotor motorFrontRight = hardwareMap.dcMotor.get("motorFrontRight");
-        DcMotor motorFrontLeft = hardwareMap.dcMotor.get("motorFrontLeft");
-        DcMotor motorBackRight = hardwareMap.dcMotor.get("motorBackRight");
-        DcMotor motorBackLeft = hardwareMap.dcMotor.get("motorBackLeft");
+        rightFront = hardwareMap.dcMotor.get("rightFront");
+        leftFront = hardwareMap.dcMotor.get("leftFront");
+        rightBack = hardwareMap.dcMotor.get("rightBack");
+        leftBack = hardwareMap.dcMotor.get("leftBack");
 
-        motorBackLeft.setDirection(DcMotor.Direction.FORWARD);
-        motorBackRight.setDirection(DcMotor.Direction.FORWARD);
-        motorFrontLeft.setDirection(DcMotor.Direction.FORWARD);
-        motorFrontRight.setDirection(DcMotor.Direction.FORWARD);
+        leftBack.setDirection(DcMotor.Direction.FORWARD);
+        rightBack.setDirection(DcMotor.Direction.REVERSE);
+        leftFront.setDirection(DcMotor.Direction.FORWARD);
+        rightFront.setDirection(DcMotor.Direction.REVERSE);
+
+        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
 
         //setting motors to fun with encoders
-        motorFrontLeft.setPower(0);
-        motorFrontRight.setPower(0);
-        motorBackRight.setPower(0);
-        motorBackLeft.setPower(0);
+        leftFront.setPower(0);
+        rightFront.setPower(0);
+        rightBack.setPower(0);
+        leftBack.setPower(0);
 
-        motorFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
 
     }
 
-    public void testEncoders() {
-        //print out encoder value for set time
-        //tell motors to float
-        motorBackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        motorBackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        motorFrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        motorFrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+    public void testMotors(){
+        leftFront.setTargetPosition(distanceToTics(10));
+        rightFront.setTargetPosition(distanceToTics(10));
+        rightBack.setTargetPosition(distanceToTics(10));
+        leftBack.setTargetPosition(distanceToTics(10));
 
-        for (int i=0; i < 10000000; i++) {
-            System.out.println(motorBackLeft.getCurrentPosition() + " "
-                    + motorBackRight.getCurrentPosition() + " "
-                    + motorFrontLeft.getCurrentPosition() + " "
-                    + motorFrontRight.getCurrentPosition());
+        leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        leftFront.setPower(.2);
+        while(leftFront.isBusy()){
+            try{
+                Thread.sleep(80);
+            }catch(Exception e){
+                System.out.print(e);
+            }
         }
-        //lock motos
-        motorBackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorBackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorFrontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorFrontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFront.setPower(.2);
+        while(rightFront.isBusy()){
+            try{
+                Thread.sleep(80);
+            }catch(Exception e){
+                System.out.print(e);
+            }
+        }
+        rightBack.setPower(.2);
+        while(rightBack.isBusy()){
+            try{
+                Thread.sleep(80);
+            }catch(Exception e){
+                System.out.print(e);
+            }
+        }
+        leftBack.setPower(.2);
+        while(leftBack.isBusy()){
+            try{
+                Thread.sleep(80);
+            }catch(Exception e){
+                System.out.print(e);
+            }
+        }
 
-        motorFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+
+    public void testEncoders() {
+        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+        for (int i = 0; i <1000; i++){
+            double lb = leftBack.getCurrentPosition();
+            double rb = rightBack.getCurrentPosition();
+            double lf = leftFront.getCurrentPosition();
+            double rf = rightFront.getCurrentPosition();
+            telemetry.addData("Left Front",lf  );
+            telemetry.addData("Left Back", lb);
+            telemetry.addData("Right Front", rf);
+            telemetry.addData("Right Back", rb);
+            telemetry.update();
+            try{
+                Thread.sleep(80);
+            }catch(Exception e){
+                System.out.print(e);
+            }
+        }
+        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+
     }
 
     public void move(int x, int y) {
@@ -177,6 +245,7 @@ public class Autonymus extends LinearOpMode {
         int distanceLB;
         int distanceRF;
         int distanceRB;
+        int Case = 0;
 
         double PowerLF;
         double PowerLB;
@@ -201,73 +270,97 @@ public class Autonymus extends LinearOpMode {
 
         } else {
             //calculates how much each motor needs to move
+            Specialdistanjce = (int)(Math.sqrt((x * x) + (y * y)));
+
             if (x < 0) {
                 //Special distnaces too fking hours thx eddie
-                specialPower = (STRAFE_FACTOR / ((x - y) / x)) + 1;
-                Specialdistanjce = (int) Math.sqrt(x ^ 2 + (y ^ 2));
+                specialPower = (double)x/(double)y + 1;
 
                 //motor power levels
-                PowerRF = 1;
-                PowerLB = 1;
-                PowerLF = specialPower;
-                PowerRB = specialPower;
+                PowerLF = POWER_FACTOR;
+                PowerRB = POWER_FACTOR;
+                PowerRF = specialPower * POWER_FACTOR;
+                PowerLB = specialPower * POWER_FACTOR;
 
                 //set motor diances
-                distanceRF = Specialdistanjce;
-                distanceLB = Specialdistanjce;
-                distanceLF = (int) (Specialdistanjce * specialPower);
-                distanceRB = (int) (Specialdistanjce * specialPower);
+                distanceLF = Specialdistanjce;
+                distanceRB = Specialdistanjce;
+                distanceRF = (int) (Specialdistanjce * specialPower);
+                distanceLB = (int) (Specialdistanjce * specialPower);
+                telemetry.addData("SPecial Power", specialPower);
+                telemetry.addData("SPecial Disyance", Specialdistanjce);
+                telemetry.addData("product", Specialdistanjce * specialPower);
+                telemetry.update();
+                Case = 1;
+
+
+
+
+
 
             } else {
                 //Special distnaces too fking hours thx eddie
-                specialPower = -(STRAFE_FACTOR / ((x + y) / x)) + 1;
-                Specialdistanjce = (int) Math.sqrt(x ^ 2 + (y ^ 2));
+                specialPower = (double)-x/(double)y + 1;
 
                 //motor power levels
-                PowerRB = POWER_FACTOR;
-                PowerLF = POWER_FACTOR;
-                PowerLB = specialPower * POWER_FACTOR;
-                PowerRF = specialPower * POWER_FACTOR;
+                PowerLB = POWER_FACTOR;
+                PowerRF = POWER_FACTOR;
+                PowerRB = specialPower * POWER_FACTOR;
+                PowerLF = specialPower * POWER_FACTOR;
 
                 //set motor diances
-                distanceRB = Specialdistanjce;
-                distanceLF = Specialdistanjce;
-                distanceLB = (int) (Specialdistanjce * specialPower);
-                distanceRF = (int) (Specialdistanjce * specialPower);
+                distanceLB = Specialdistanjce;
+                distanceRF = Specialdistanjce;
+                distanceRB = (int) (Specialdistanjce * specialPower);
+                distanceLF = (int) (Specialdistanjce * specialPower);
+                Case = 2;
 
             }
         }
         //calculates number of tics necessary and tells motors to go that many
-        motorFrontLeft.setTargetPosition(distanceToTics(distanceLF));
-        motorFrontRight.setTargetPosition(distanceToTics(distanceRF));
-        motorBackRight.setTargetPosition(distanceToTics(distanceRB));
-        motorBackLeft.setTargetPosition(distanceToTics(distanceLB));
+        leftFront.setTargetPosition(distanceToTics(distanceLF));
+        rightFront.setTargetPosition(distanceToTics(distanceRF));
+        rightBack.setTargetPosition(distanceToTics(distanceRB));
+        leftBack.setTargetPosition(distanceToTics(distanceLB));
 
-        motorFrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        motorFrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        motorBackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        motorBackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        motorFrontLeft.setPower(PowerLF);
-        motorFrontRight.setPower(PowerRF);
-        motorBackRight.setPower(PowerRB);
-        motorBackLeft.setPower(PowerLB);
-
-        while (motorsRunning()) {
-
+        leftFront.setPower(PowerLF);
+        rightFront.setPower(PowerRF);
+        rightBack.setPower(PowerRB);
+        leftBack.setPower(PowerLB);
+        if(Case == 1){
+            while (rightFront.isBusy() && leftBack.isBusy()) {
+                try{
+                    Thread.sleep(80);
+                }catch(Exception e){
+                    System.out.print(e);
+                }
+            }
+        }else if(Case == 2){
+            while (leftFront.isBusy() && rightBack.isBusy()) {
+                try{
+                    Thread.sleep(80);
+                }catch(Exception e){
+                    System.out.print(e);
+                }
+            }
         }
 
         //stops everything
-        motorFrontLeft.setPower(0);
-        motorFrontRight.setPower(0);
-        motorBackRight.setPower(0);
-        motorBackLeft.setPower(0);
+        leftFront.setPower(0);
+        rightFront.setPower(0);
+        rightBack.setPower(0);
+        leftBack.setPower(0);
 
         //Resets
-        motorFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
         //tells us new location
@@ -279,7 +372,13 @@ public class Autonymus extends LinearOpMode {
 
     public void moveTo(int x, int y) {
         //moves to desired x,y
-        double slope = y / x;
+        double slope;
+        if(x == 0){
+            slope = 0;
+        }else{
+            slope = (double)y / (double)x;
+        }
+
         if (-1 <= slope && slope < 1) {
             if (y >= 0) {
                 rotateTo(0);
@@ -303,10 +402,19 @@ public class Autonymus extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         initalize();
-        testEncoders();
-        moveTo(27, 7);
+
         waitForStart();
+        telemetry.addData("Status", "Started");
+        telemetry.update();
+        Thread.sleep(100);
+        move(-20, 30);
+
+        telemetry.addData("Status", "Done");
+        telemetry.update();
     }
 
 }
+
+
+
 
