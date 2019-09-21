@@ -3,7 +3,10 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 import java.lang.*;
 
@@ -27,7 +30,12 @@ public class Autonymus extends LinearOpMode {
     private int robotY = 0;
     //robot direction facing
     private int direction = 0;
+
+    // case for movement command
     private int Case = 0;
+
+    // gyro things
+    private BNO055IMU hero;
 
     //declaring motors
     private DcMotor rightFront;
@@ -35,7 +43,10 @@ public class Autonymus extends LinearOpMode {
     private DcMotor rightBack;
     private DcMotor leftBack;
 
-    //ticks per revolution
+    //importing other stuff
+    private PEDstates Psd = new PEDstates(0.02, 0, 0.01, 0.4, -0.4);
+
+    //ticks per motor full rotation
     static final double MOTOR_TICK_COUNT = 537.6;
 
     //wheel diameter cm
@@ -44,16 +55,13 @@ public class Autonymus extends LinearOpMode {
     //circumference of wheels in centimeters
     static final double WHEEL_CIRCUMFRENCE = Math.PI * WHEEL_DIAMETER;
 
-    //Bot radius as in distance from center point to wheels
-    static final int ROBOT_RADIOUS = 16;
-
     //Power limit
     static final double POWER_FACTOR = .3;
 
     //number of rotations of wheels to move wheel (circumference) at 45degree strafe
     static final int STRAFE_FACTOR = 2;
 
-    //gear ratio
+    //gear ratio wheel divided by motor
     static final double GEER_RATIO = 4/3;
 
 
@@ -65,6 +73,7 @@ public class Autonymus extends LinearOpMode {
 
     public int distanceToTics(double d) {
         //d is centimeters want to travel
+        //divides the distance yoi want to got by circumfrance to get number of motor rotations necessary then converts to number to tics needed to do so
         return (int) (d / WHEEL_CIRCUMFRENCE * MOTOR_TICK_COUNT * GEER_RATIO);
     }
 
@@ -72,23 +81,19 @@ public class Autonymus extends LinearOpMode {
 
     public void rotate(int degrees) {
         //rotates robot specific degrees requested
+        Psd.settarget(degrees);
 
-        double ditsagacne = ROBOT_RADIOUS * 2 * Math.PI * degrees / 360;
-
-        leftFront.setTargetPosition((int) ditsagacne * STRAFE_FACTOR);
-        rightFront.setTargetPosition((int) ditsagacne * STRAFE_FACTOR);
-        rightBack.setTargetPosition((int) ditsagacne * STRAFE_FACTOR);
-        leftBack.setTargetPosition((int) ditsagacne * STRAFE_FACTOR);
-
-        leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         leftFront.setPower(POWER_FACTOR);
         rightFront.setPower(POWER_FACTOR);
         rightBack.setPower(POWER_FACTOR);
         leftBack.setPower(POWER_FACTOR);
+
+
 
         while (leftFront.isBusy() && rightFront.isBusy() && leftBack.isBusy() && rightBack.isBusy()) {
 
@@ -136,6 +141,17 @@ public class Autonymus extends LinearOpMode {
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        //IMU stuff
+        BNO055IMU.Parameters gyro_parameters = new BNO055IMU.Parameters();
+        gyro_parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        gyro_parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        gyro_parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample Opmode
+        gyro_parameters.loggingEnabled = true;
+        gyro_parameters.loggingTag = "IMU";
+        gyro_parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        hero = hardwareMap.get(BNO055IMU.class, "hero"); //The name of our heroic IMU
+        hero.initialize(gyro_parameters);
+        hero.startAccelerationIntegration(new Position(), new Velocity(), 1000);
 
         //setting motors to fun with encoders
         leftFront.setPower(0);
