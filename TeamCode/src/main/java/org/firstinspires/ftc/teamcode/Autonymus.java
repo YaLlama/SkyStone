@@ -461,7 +461,15 @@ public class Autonymus extends LinearOpMode {
 
             }
         }
-        move(Math.abs(x), Math.abs(y));
+        x = Math.abs(x);
+        y = Math.abs(y);
+        int placehgolder;
+        if(x > y){
+            placehgolder = x;
+            x = y;
+            y = placehgolder;
+        }
+        move(x, y);
     }
 
 
