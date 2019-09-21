@@ -272,7 +272,7 @@ public class Autonymus extends LinearOpMode {
             //calculates how much each motor needs to move
             Specialdistanjce = (int)(Math.sqrt((x * x) + (y * y)));
             // currently wronmg needs to be fixed
-            specialPower = -(Math.abs((double)x))/(double)y + 1;
+            specialPower = (Math.atan(y/x)/45) - 1;
 
             if(Case == 1){
                 //motor power levels
@@ -481,7 +481,7 @@ public class Autonymus extends LinearOpMode {
         telemetry.addData("Status", "Started");
         telemetry.update();
         Thread.sleep(100);
-        move(-20, 30);
+        moveTo(20, 30);
 
         telemetry.addData("Status", "Done");
         telemetry.update();
