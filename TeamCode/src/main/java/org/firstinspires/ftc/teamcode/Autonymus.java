@@ -252,8 +252,8 @@ public class Autonymus extends LinearOpMode {
         double PowerRF;
         double PowerRB;
 
-        double specialPower = 0;
-        int Specialdistanjce = 0;
+        double specialPower;
+        int Specialdistanjce;
 
 
         //if no horizontal movement is necessary
@@ -272,7 +272,7 @@ public class Autonymus extends LinearOpMode {
             //calculates how much each motor needs to move
             Specialdistanjce = (int)(Math.sqrt((x * x) + (y * y)));
             // currently wronmg needs to be fixed
-            specialPower = (Math.atan(y/x)/45) - 1;
+            specialPower = Math.toDegrees(Math.atan(y/x))/45 - 1;
 
             if(Case == 1){
                 //motor power levels
