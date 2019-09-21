@@ -27,6 +27,7 @@ public class Autonymus extends LinearOpMode {
     private int robotY = 0;
     //robot direction facing
     private int direction = 0;
+    private int Case = 0;
 
     //declaring motors
     private DcMotor rightFront;
@@ -245,15 +246,14 @@ public class Autonymus extends LinearOpMode {
         int distanceLB;
         int distanceRF;
         int distanceRB;
-        int Case = 0;
 
         double PowerLF;
         double PowerLB;
         double PowerRF;
         double PowerRB;
 
-        double specialPower;
-        int Specialdistanjce;
+        double specialPower = 0;
+        int Specialdistanjce = 0;
 
 
         //if no horizontal movement is necessary
@@ -271,11 +271,22 @@ public class Autonymus extends LinearOpMode {
         } else {
             //calculates how much each motor needs to move
             Specialdistanjce = (int)(Math.sqrt((x * x) + (y * y)));
+            // currently wronmg needs to be fixed
+            specialPower = -(Math.abs((double)x))/(double)y + 1;
 
-            if (x < 0) {
-                //Special distnaces too fking hours thx eddie
-                specialPower = (double)x/(double)y + 1;
+            if(Case == 1){
+                //motor power levels
+                PowerRF = POWER_FACTOR;
+                PowerLB = POWER_FACTOR;
+                PowerLF = specialPower * POWER_FACTOR;
+                PowerRB = specialPower * POWER_FACTOR;
 
+                //set motor diances
+                distanceRF = Specialdistanjce;
+                distanceLB = Specialdistanjce;
+                distanceLF = (int) (Specialdistanjce * specialPower);
+                distanceRB = (int) (Specialdistanjce * specialPower);
+            }else if(Case == 2){
                 //motor power levels
                 PowerLF = POWER_FACTOR;
                 PowerRB = POWER_FACTOR;
@@ -287,36 +298,83 @@ public class Autonymus extends LinearOpMode {
                 distanceRB = Specialdistanjce;
                 distanceRF = (int) (Specialdistanjce * specialPower);
                 distanceLB = (int) (Specialdistanjce * specialPower);
-                telemetry.addData("SPecial Power", specialPower);
-                telemetry.addData("SPecial Disyance", Specialdistanjce);
-                telemetry.addData("product", Specialdistanjce * specialPower);
-                telemetry.update();
-                Case = 1;
-
-
-
-
-
-
-            } else {
-                //Special distnaces too fking hours thx eddie
-                specialPower = (double)-x/(double)y + 1;
-
+            }else if(Case == 3){
                 //motor power levels
-                PowerLB = POWER_FACTOR;
-                PowerRF = POWER_FACTOR;
-                PowerRB = specialPower * POWER_FACTOR;
-                PowerLF = specialPower * POWER_FACTOR;
+                PowerLF = POWER_FACTOR;
+                PowerRB = POWER_FACTOR;
+                PowerRF = -specialPower * POWER_FACTOR;
+                PowerLB = -specialPower * POWER_FACTOR;
 
                 //set motor diances
-                distanceLB = Specialdistanjce;
-                distanceRF = Specialdistanjce;
-                distanceRB = (int) (Specialdistanjce * specialPower);
-                distanceLF = (int) (Specialdistanjce * specialPower);
-                Case = 2;
+                distanceLF = Specialdistanjce;
+                distanceRB = Specialdistanjce;
+                distanceRF = (int) (Specialdistanjce * specialPower);
+                distanceLB = (int) (Specialdistanjce * specialPower);
+            }else if(Case == 4){
+                //motor power levels
+                PowerRF = -POWER_FACTOR;
+                PowerLB = -POWER_FACTOR;
+                PowerLF = specialPower * POWER_FACTOR;
+                PowerRB = specialPower * POWER_FACTOR;
 
+                //set motor diances
+                distanceRF = Specialdistanjce;
+                distanceLB = Specialdistanjce;
+                distanceLF = (int) (Specialdistanjce * specialPower);
+                distanceRB = (int) (Specialdistanjce * specialPower);
+            }else if(Case == 5){
+                //motor power levels
+                PowerLF = -POWER_FACTOR;
+                PowerRB = -POWER_FACTOR;
+                PowerRF = -specialPower * POWER_FACTOR;
+                PowerLB = -specialPower * POWER_FACTOR;
+
+                //set motor diances
+                distanceLF = Specialdistanjce;
+                distanceRB = Specialdistanjce;
+                distanceRF = (int) (Specialdistanjce * specialPower);
+                distanceLB = (int) (Specialdistanjce * specialPower);
+            }else if(Case == 6){
+                //motor power levels
+                PowerRF = -POWER_FACTOR;
+                PowerLB = -POWER_FACTOR;
+                PowerLF = -specialPower * POWER_FACTOR;
+                PowerRB = -specialPower * POWER_FACTOR;
+
+                //set motor diances
+                distanceRF = Specialdistanjce;
+                distanceLB = Specialdistanjce;
+                distanceLF = (int) (Specialdistanjce * specialPower);
+                distanceRB = (int) (Specialdistanjce * specialPower);
+            }else if(Case == 7){
+                //motor power levels
+                PowerLF = -POWER_FACTOR;
+                PowerRB = -POWER_FACTOR;
+                PowerRF = specialPower * POWER_FACTOR;
+                PowerLB = specialPower * POWER_FACTOR;
+
+                //set motor diances
+                distanceLF = Specialdistanjce;
+                distanceRB = Specialdistanjce;
+                distanceRF = (int) (Specialdistanjce * specialPower);
+                distanceLB = (int) (Specialdistanjce * specialPower);
+            }else{
+                //motor power levels
+                PowerRF = POWER_FACTOR;
+                PowerLB = POWER_FACTOR;
+                PowerLF = -specialPower * POWER_FACTOR;
+                PowerRB = -specialPower * POWER_FACTOR;
+
+                //set motor diances
+                distanceRF = Specialdistanjce;
+                distanceLB = Specialdistanjce;
+                distanceLF = (int) (Specialdistanjce * specialPower);
+                distanceRB = (int) (Specialdistanjce * specialPower);
             }
+
         }
+
+
         //calculates number of tics necessary and tells motors to go that many
         leftFront.setTargetPosition(distanceToTics(distanceLF));
         rightFront.setTargetPosition(distanceToTics(distanceRF));
@@ -332,21 +390,12 @@ public class Autonymus extends LinearOpMode {
         rightFront.setPower(PowerRF);
         rightBack.setPower(PowerRB);
         leftBack.setPower(PowerLB);
-        if(Case == 1){
-            while (rightFront.isBusy() && leftBack.isBusy()) {
-                try{
-                    Thread.sleep(80);
-                }catch(Exception e){
-                    System.out.print(e);
-                }
-            }
-        }else if(Case == 2){
-            while (leftFront.isBusy() && rightBack.isBusy()) {
-                try{
-                    Thread.sleep(80);
-                }catch(Exception e){
-                    System.out.print(e);
-                }
+
+        while (rightFront.isBusy() && leftBack.isBusy() && leftFront.isBusy() && rightBack.isBusy()) {
+            try{
+                Thread.sleep(80);
+            }catch(Exception e){
+                System.out.print(e);
             }
         }
 
@@ -381,21 +430,38 @@ public class Autonymus extends LinearOpMode {
 
         if (-1 <= slope && slope < 1) {
             if (y >= 0) {
-                rotateTo(0);
-                move(x, y);
+                if(x < 0){
+                    Case = 1;
+                }else{
+                    Case = 2;
+                }
+
             } else {
-                rotateTo(180);
-                move(-x, -y);
+                if(x < 0){
+                    Case = 6;
+                }else{
+                    Case = 5;
+                }
+
             }
         } else {
             if (x > 0) {
-                rotateTo(270);
-                move(x, -y);
+                if(y < 0){
+                    Case = 7;
+                }else{
+                    Case = 8;
+                }
+
             } else {
-                rotateTo(90);
-                move(-x, y);
+                if(y < 0){
+                    Case = 4;
+                }else{
+                    Case = 3;
+                }
+
             }
         }
+        move(Math.abs(x), Math.abs(y));
     }
 
 
