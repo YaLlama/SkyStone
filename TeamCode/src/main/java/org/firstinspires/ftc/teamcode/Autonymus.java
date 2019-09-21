@@ -44,7 +44,6 @@ public class Autonymus extends LinearOpMode {
     private DcMotor leftBack;
 
     //importing other stuff
-    private PEDstates Psd = new PEDstates(0.02, 0, 0.01, 0.4, -0.4);
 
     //ticks per motor full rotation
     static final double MOTOR_TICK_COUNT = 537.6;
@@ -56,7 +55,7 @@ public class Autonymus extends LinearOpMode {
     static final double WHEEL_CIRCUMFRENCE = Math.PI * WHEEL_DIAMETER;
 
     //Power limit
-    static final double POWER_FACTOR = .3;
+    static final double POWER_FACTOR = .6;
 
     //number of rotations of wheels to move wheel (circumference) at 45degree strafe
     static final int STRAFE_FACTOR = 2;
@@ -79,50 +78,6 @@ public class Autonymus extends LinearOpMode {
 
 
 
-    public void rotateTo(int degrees) {
-        //rotates robot specific degrees requested
-        Psd.settarget(degrees);
-        Psd.setinitial(direction);
-
-        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        leftFront.setPower(POWER_FACTOR);
-        rightFront.setPower(POWER_FACTOR);
-        rightBack.setPower(POWER_FACTOR);
-        leftBack.setPower(POWER_FACTOR);
-
-
-
-        while (!Psd.finished()) {
-            try{
-                Thread.sleep(80);
-            }catch(Exception e){
-                System.out.print(e);
-            }
-        }
-
-        leftFront.setPower(0);
-        rightFront.setPower(0);
-        rightBack.setPower(0);
-        leftBack.setPower(0);
-
-        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        direction = direction + degrees;
-        while (direction < 0 || 360 < direction) {
-            if (direction < 0) {
-                direction += 360;
-            } else {
-                direction -= 360;
-            }
-        }
-    }
 
 
 
@@ -290,7 +245,7 @@ public class Autonymus extends LinearOpMode {
             //calculates how much each motor needs to move
             Specialdistanjce = (int)(Math.sqrt((x * x) + (y * y)));
             // currently wronmg needs to be fixed
-            specialPower = Math.toDegrees(Math.atan(y/x))/45 - 1;
+            specialPower = Math.toDegrees(Math.atan((double)y/(double)x))/45 - 1;
 
             if(Case == 1){
                 //motor power levels
@@ -326,8 +281,8 @@ public class Autonymus extends LinearOpMode {
                 //set motor diances
                 distanceLF = Specialdistanjce;
                 distanceRB = Specialdistanjce;
-                distanceRF = (int) (Specialdistanjce * specialPower);
-                distanceLB = (int) (Specialdistanjce * specialPower);
+                distanceRF = (int) -(Specialdistanjce * specialPower);
+                distanceLB = (int) -(Specialdistanjce * specialPower);
             }else if(Case == 4){
                 //motor power levels
                 PowerRF = -POWER_FACTOR;
@@ -336,8 +291,8 @@ public class Autonymus extends LinearOpMode {
                 PowerRB = specialPower * POWER_FACTOR;
 
                 //set motor diances
-                distanceRF = Specialdistanjce;
-                distanceLB = Specialdistanjce;
+                distanceRF = -Specialdistanjce;
+                distanceLB = -Specialdistanjce;
                 distanceLF = (int) (Specialdistanjce * specialPower);
                 distanceRB = (int) (Specialdistanjce * specialPower);
             }else if(Case == 5){
@@ -348,10 +303,15 @@ public class Autonymus extends LinearOpMode {
                 PowerLB = -specialPower * POWER_FACTOR;
 
                 //set motor diances
-                distanceLF = Specialdistanjce;
-                distanceRB = Specialdistanjce;
-                distanceRF = (int) (Specialdistanjce * specialPower);
-                distanceLB = (int) (Specialdistanjce * specialPower);
+                distanceLF = -Specialdistanjce;
+                distanceRB = -Specialdistanjce;
+                distanceRF = (int) -(Specialdistanjce * specialPower);
+                distanceLB = (int) -(Specialdistanjce * specialPower);
+                telemetry.addData("special power", PowerRF);
+                telemetry.addData("short distance", distanceLF);
+                telemetry.addData("long distance", distanceLB);
+                telemetry.update();
+
             }else if(Case == 6){
                 //motor power levels
                 PowerRF = -POWER_FACTOR;
@@ -360,10 +320,10 @@ public class Autonymus extends LinearOpMode {
                 PowerRB = -specialPower * POWER_FACTOR;
 
                 //set motor diances
-                distanceRF = Specialdistanjce;
-                distanceLB = Specialdistanjce;
-                distanceLF = (int) (Specialdistanjce * specialPower);
-                distanceRB = (int) (Specialdistanjce * specialPower);
+                distanceRF = -Specialdistanjce;
+                distanceLB = -Specialdistanjce;
+                distanceLF = (int) -(Specialdistanjce * specialPower);
+                distanceRB = (int) -(Specialdistanjce * specialPower);
             }else if(Case == 7){
                 //motor power levels
                 PowerLF = -POWER_FACTOR;
@@ -372,8 +332,8 @@ public class Autonymus extends LinearOpMode {
                 PowerLB = specialPower * POWER_FACTOR;
 
                 //set motor diances
-                distanceLF = Specialdistanjce;
-                distanceRB = Specialdistanjce;
+                distanceLF = -Specialdistanjce;
+                distanceRB = -Specialdistanjce;
                 distanceRF = (int) (Specialdistanjce * specialPower);
                 distanceLB = (int) (Specialdistanjce * specialPower);
             }else{
@@ -386,8 +346,8 @@ public class Autonymus extends LinearOpMode {
                 //set motor diances
                 distanceRF = Specialdistanjce;
                 distanceLB = Specialdistanjce;
-                distanceLF = (int) (Specialdistanjce * specialPower);
-                distanceRB = (int) (Specialdistanjce * specialPower);
+                distanceLF = (int) -(Specialdistanjce * specialPower);
+                distanceRB = (int) -(Specialdistanjce * specialPower);
             }
 
         }
@@ -450,15 +410,19 @@ public class Autonymus extends LinearOpMode {
             if (y >= 0) {
                 if(x < 0){
                     Case = 1;
+                    telemetry.addData("case", 1);
                 }else{
                     Case = 2;
+                    telemetry.addData("case", 2);
                 }
 
             } else {
                 if(x < 0){
                     Case = 6;
+                    telemetry.addData("case", 6);
                 }else{
                     Case = 5;
+                    telemetry.addData("case", 5);
                 }
 
             }
@@ -466,23 +430,28 @@ public class Autonymus extends LinearOpMode {
             if (x > 0) {
                 if(y < 0){
                     Case = 7;
+                    telemetry.addData("case", 7);
                 }else{
                     Case = 8;
+                    telemetry.addData("case", 8);
                 }
 
             } else {
                 if(y < 0){
                     Case = 4;
+                    telemetry.addData("case", 4);
                 }else{
                     Case = 3;
+                    telemetry.addData("case", 3);
                 }
 
             }
         }
+        telemetry.update();
         x = Math.abs(x);
         y = Math.abs(y);
         int placehgolder;
-        if(x > y){
+        if(false){
             placehgolder = x;
             x = y;
             y = placehgolder;
@@ -499,7 +468,8 @@ public class Autonymus extends LinearOpMode {
         telemetry.addData("Status", "Started");
         telemetry.update();
         Thread.sleep(100);
-        moveTo(20, 30);
+        moveTo(-120, 0);
+        moveTo(120, 0);
 
         telemetry.addData("Status", "Done");
         telemetry.update();
