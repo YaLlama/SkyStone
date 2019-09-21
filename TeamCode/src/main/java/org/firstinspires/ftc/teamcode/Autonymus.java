@@ -79,9 +79,10 @@ public class Autonymus extends LinearOpMode {
 
 
 
-    public void rotate(int degrees) {
+    public void rotateTo(int degrees) {
         //rotates robot specific degrees requested
         Psd.settarget(degrees);
+        Psd.setinitial(direction);
 
         leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -95,8 +96,12 @@ public class Autonymus extends LinearOpMode {
 
 
 
-        while (leftFront.isBusy() && rightFront.isBusy() && leftBack.isBusy() && rightBack.isBusy()) {
-
+        while (!Psd.finished()) {
+            try{
+                Thread.sleep(80);
+            }catch(Exception e){
+                System.out.print(e);
+            }
         }
 
         leftFront.setPower(0);
@@ -119,9 +124,6 @@ public class Autonymus extends LinearOpMode {
         }
     }
 
-    public void rotateTo(int degrees) {
-        rotate(degrees - direction);
-    }
 
 
     public void initalize() {
