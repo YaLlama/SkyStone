@@ -44,9 +44,6 @@ public class SKIIIIIIIIIRT {
     //Power limit
     public double POWER_FACTOR;
 
-    //number of rotations of wheels to move wheel (circumference) at 45degree strafe
-    static final int STRAFE_FACTOR = 2;
-
     //gear ratio wheel divided by motor
     static final double GEER_RATIO = 4/3;
 
@@ -60,7 +57,7 @@ public class SKIIIIIIIIIRT {
     public int distanceToTics(double d) {
         //d is centimeters want to travel
         //divides the distance yoi want to got by circumfrance to get number of motor rotations necessary then converts to number to tics needed to do so
-        return (int) (d / WHEEL_CIRCUMFRENCE * MOTOR_TICK_COUNT * GEER_RATIO);
+        return (int) (d / WHEEL_CIRCUMFRENCE * MOTOR_TICK_COUNT * GEER_RATIO * 2);
     }
 
     public void initalize(DcMotor RF, DcMotor RB, DcMotor LF, DcMotor LB, double powerCap) {
@@ -167,10 +164,10 @@ public class SKIIIIIIIIIRT {
 
         //if no horizontal movement is necessary
         if (x == 0) {
-            distanceLF = STRAFE_FACTOR * y;
-            distanceLB = STRAFE_FACTOR * y;
-            distanceRF = STRAFE_FACTOR * y;
-            distanceRB = STRAFE_FACTOR * y;
+            distanceLF = y;
+            distanceLB = y;
+            distanceRF = y;
+            distanceRB = y;
 
             PowerLB = POWER_FACTOR;
             PowerLF = POWER_FACTOR;
@@ -178,10 +175,11 @@ public class SKIIIIIIIIIRT {
             PowerRF = POWER_FACTOR;
 
         } else {
-            //calculates how much each motor needs to move
-            Specialdistanjce = (int)(Math.sqrt((x * x) + (y * y)));
             // currently wronmg needs to be fixed
             specialPower = Math.toDegrees(Math.atan(Math.abs((double)y/(double)x)));
+            //calculates how much each motor needs to move
+            Specialdistanjce = (int)(Math.sqrt((x * x) + (y * y)));
+
 
 
             if(specialPower == 45){
