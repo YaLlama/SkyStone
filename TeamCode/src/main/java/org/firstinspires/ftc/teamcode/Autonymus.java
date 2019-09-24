@@ -31,6 +31,8 @@ public class Autonymus extends LinearOpMode {
     //robot direction facing
     private int direction = 0;
 
+    boolean swapped = false;
+
     // case for movement command
     private int Case = 0;
 
@@ -228,6 +230,8 @@ public class Autonymus extends LinearOpMode {
         double specialPower;
         int Specialdistanjce;
 
+        boolean PerfectStrafe = false;
+
 
         //if no horizontal movement is necessary
         if (x == 0) {
@@ -245,7 +249,25 @@ public class Autonymus extends LinearOpMode {
             //calculates how much each motor needs to move
             Specialdistanjce = (int)(Math.sqrt((x * x) + (y * y)));
             // currently wronmg needs to be fixed
-            specialPower = Math.toDegrees(Math.atan((double)y/(double)x))/45 - 1;
+            specialPower = Math.abs(Math.toDegrees(Math.atan((double)y/(double)x)));
+
+
+            if(specialPower == 45){
+                specialPower = 0;
+                PerfectStrafe = true;
+            }
+            else if(specialPower > 45){
+                specialPower = specialPower / 45 - 1;
+            }else{
+                specialPower = -specialPower / 45 +1;
+            }
+
+            if(swapped){
+                int placeholder = x;
+                x = y;
+                y = placeholder;
+                swapped = false;
+            }
 
             if(Case == 1){
                 //motor power levels
@@ -266,17 +288,20 @@ public class Autonymus extends LinearOpMode {
                 PowerRF = specialPower * POWER_FACTOR;
                 PowerLB = specialPower * POWER_FACTOR;
 
+
                 //set motor diances
                 distanceLF = Specialdistanjce;
                 distanceRB = Specialdistanjce;
                 distanceRF = (int) (Specialdistanjce * specialPower);
                 distanceLB = (int) (Specialdistanjce * specialPower);
+
+
             }else if(Case == 3){
                 //motor power levels
                 PowerLF = POWER_FACTOR;
                 PowerRB = POWER_FACTOR;
-                PowerRF = -specialPower * POWER_FACTOR;
-                PowerLB = -specialPower * POWER_FACTOR;
+                PowerRF = specialPower * POWER_FACTOR;
+                PowerLB = specialPower * POWER_FACTOR;
 
                 //set motor diances
                 distanceLF = Specialdistanjce;
@@ -285,49 +310,48 @@ public class Autonymus extends LinearOpMode {
                 distanceLB = (int) -(Specialdistanjce * specialPower);
             }else if(Case == 4){
                 //motor power levels
-                PowerRF = -POWER_FACTOR;
-                PowerLB = -POWER_FACTOR;
+                PowerRF = POWER_FACTOR;
+                PowerLB = POWER_FACTOR;
                 PowerLF = specialPower * POWER_FACTOR;
                 PowerRB = specialPower * POWER_FACTOR;
+
 
                 //set motor diances
                 distanceRF = -Specialdistanjce;
                 distanceLB = -Specialdistanjce;
                 distanceLF = (int) (Specialdistanjce * specialPower);
                 distanceRB = (int) (Specialdistanjce * specialPower);
+
             }else if(Case == 5){
                 //motor power levels
-                PowerLF = -POWER_FACTOR;
-                PowerRB = -POWER_FACTOR;
-                PowerRF = -specialPower * POWER_FACTOR;
-                PowerLB = -specialPower * POWER_FACTOR;
-
-                //set motor diances
-                distanceLF = -Specialdistanjce;
-                distanceRB = -Specialdistanjce;
-                distanceRF = (int) -(Specialdistanjce * specialPower);
-                distanceLB = (int) -(Specialdistanjce * specialPower);
-                telemetry.addData("special power", PowerRF);
-                telemetry.addData("short distance", distanceLF);
-                telemetry.addData("long distance", distanceLB);
-                telemetry.update();
-
-            }else if(Case == 6){
-                //motor power levels
-                PowerRF = -POWER_FACTOR;
-                PowerLB = -POWER_FACTOR;
-                PowerLF = -specialPower * POWER_FACTOR;
-                PowerRB = -specialPower * POWER_FACTOR;
+                PowerRF = POWER_FACTOR;
+                PowerLB = POWER_FACTOR;
+                PowerLF = specialPower * POWER_FACTOR;
+                PowerRB = specialPower * POWER_FACTOR;
 
                 //set motor diances
                 distanceRF = -Specialdistanjce;
                 distanceLB = -Specialdistanjce;
                 distanceLF = (int) -(Specialdistanjce * specialPower);
                 distanceRB = (int) -(Specialdistanjce * specialPower);
+
+            }else if(Case == 6){
+                //motor power levels
+                PowerLF = POWER_FACTOR;
+                PowerRB = POWER_FACTOR;
+                PowerRF = specialPower * POWER_FACTOR;
+                PowerLB = specialPower * POWER_FACTOR;
+
+                //set motor diances
+                distanceLF = -Specialdistanjce;
+                distanceRB = -Specialdistanjce;
+                distanceRF = (int) -(Specialdistanjce * specialPower);
+                distanceLB = (int) -(Specialdistanjce * specialPower);
+
             }else if(Case == 7){
                 //motor power levels
-                PowerLF = -POWER_FACTOR;
-                PowerRB = -POWER_FACTOR;
+                PowerLF = POWER_FACTOR;
+                PowerRB = POWER_FACTOR;
                 PowerRF = specialPower * POWER_FACTOR;
                 PowerLB = specialPower * POWER_FACTOR;
 
@@ -340,8 +364,8 @@ public class Autonymus extends LinearOpMode {
                 //motor power levels
                 PowerRF = POWER_FACTOR;
                 PowerLB = POWER_FACTOR;
-                PowerLF = -specialPower * POWER_FACTOR;
-                PowerRB = -specialPower * POWER_FACTOR;
+                PowerLF = specialPower * POWER_FACTOR;
+                PowerRB = specialPower * POWER_FACTOR;
 
                 //set motor diances
                 distanceRF = Specialdistanjce;
@@ -369,13 +393,42 @@ public class Autonymus extends LinearOpMode {
         rightBack.setPower(PowerRB);
         leftBack.setPower(PowerLB);
 
-        while (rightFront.isBusy() && leftBack.isBusy() && leftFront.isBusy() && rightBack.isBusy()) {
-            try{
-                Thread.sleep(80);
-            }catch(Exception e){
-                System.out.print(e);
+        if(PerfectStrafe){
+            if(y/x > 0){
+                while (leftFront.isBusy() && rightBack.isBusy()) {
+                    try{
+                        Thread.sleep(80);
+                    }catch(Exception e){
+                        System.out.print(e);
+                    }
+                    telemetry.addData("working", true);
+                    telemetry.update();
+                }
+            }else{
+                while (rightFront.isBusy() && leftBack.isBusy()) {
+                    try{
+                        Thread.sleep(80);
+                    }catch(Exception e){
+                        System.out.print(e);
+                    }
+                    telemetry.addData("working", true);
+                    telemetry.update();
+                }
+            }
+        }else{
+            while (rightFront.isBusy() && leftBack.isBusy() && leftFront.isBusy() && rightBack.isBusy()) {
+                try{
+                    Thread.sleep(80);
+                }catch(Exception e){
+                    System.out.print(e);
+                }
+                telemetry.addData("working", true);
+                telemetry.update();
             }
         }
+        telemetry.addData("done", true);
+        telemetry.update();
+
 
         //stops everything
         leftFront.setPower(0);
@@ -406,7 +459,7 @@ public class Autonymus extends LinearOpMode {
             slope = (double)y / (double)x;
         }
 
-        if (-1 <= slope && slope < 1) {
+        if (-1 <= slope && slope <= 1) {
             if (y >= 0) {
                 if(x < 0){
                     Case = 1;
@@ -429,19 +482,19 @@ public class Autonymus extends LinearOpMode {
         } else {
             if (x > 0) {
                 if(y < 0){
-                    Case = 7;
+                    Case = 4;
                     telemetry.addData("case", 7);
                 }else{
-                    Case = 8;
+                    Case = 3;
                     telemetry.addData("case", 8);
                 }
 
             } else {
                 if(y < 0){
-                    Case = 4;
+                    Case = 7;
                     telemetry.addData("case", 4);
                 }else{
-                    Case = 3;
+                    Case = 8;
                     telemetry.addData("case", 3);
                 }
 
@@ -450,12 +503,14 @@ public class Autonymus extends LinearOpMode {
         telemetry.update();
         x = Math.abs(x);
         y = Math.abs(y);
-        int placehgolder;
-        if(false){
-            placehgolder = x;
+
+        if(x > y){
+            int placeholder = x;
             x = y;
-            y = placehgolder;
+            y = placeholder;
+            swapped = true;
         }
+
         move(x, y);
     }
 
@@ -468,8 +523,18 @@ public class Autonymus extends LinearOpMode {
         telemetry.addData("Status", "Started");
         telemetry.update();
         Thread.sleep(100);
-        moveTo(-120, 0);
-        moveTo(120, 0);
+        moveTo(45, 45);
+        moveTo(-45, -45);
+        moveTo(60, 30);
+        moveTo(-60, -30);
+        moveTo(30, 60);
+        moveTo(-30, -60);
+        moveTo(-45, 45);
+        moveTo(45, -45);
+        moveTo(-30, 60);
+        moveTo(30, -60);
+        moveTo(-30, 60);
+        moveTo(30, -60);
 
         telemetry.addData("Status", "Done");
         telemetry.update();
