@@ -1,22 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+
 
 import java.lang.*;
 
-
-
-
-
-@Autonomous(name="Autonymus")
 public class Autonymus {
-
 
     //VARIABLES
     //
@@ -26,14 +15,14 @@ public class Autonymus {
 
     //location ,location, location
     //robot staring location
-    private int robotX = 0;
-    private int robotY = 0;
+    public int robotX = 0;
+    public int robotY = 0;
 
     //for moving command
     boolean swapped = false;
 
     // case for movement command
-    private int Case = 0;
+    public int Case = 0;
 
     //declaring motors
     private DcMotor rightFront;
@@ -62,7 +51,7 @@ public class Autonymus {
     static final double GEER_RATIO = 4/3;
 
 
-    //SHORTCUTS
+    //SHORTCUTS / COMMANDS
     //
     //
     //
@@ -73,11 +62,6 @@ public class Autonymus {
         //divides the distance yoi want to got by circumfrance to get number of motor rotations necessary then converts to number to tics needed to do so
         return (int) (d / WHEEL_CIRCUMFRENCE * MOTOR_TICK_COUNT * GEER_RATIO);
     }
-
-
-
-
-
 
     public void initalize(DcMotor RF, DcMotor RB, DcMotor LF, DcMotor LB) {
         //declaring motors
@@ -105,7 +89,7 @@ public class Autonymus {
         leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);p
+        leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
     }
 
@@ -157,37 +141,6 @@ public class Autonymus {
         rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    }
-
-    public void testEncoders() {
-        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
-        for (int i = 0; i <1000; i++){
-            double lb = leftBack.getCurrentPosition();
-            double rb = rightBack.getCurrentPosition();
-            double lf = leftFront.getCurrentPosition();
-            double rf = rightFront.getCurrentPosition();
-
-            try{
-                Thread.sleep(80);
-            }catch(Exception e){
-                System.out.print(e);
-            }
-        }
-        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-
     }
 
     public void move(int x, int y) {
