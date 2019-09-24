@@ -57,7 +57,7 @@ public class SKIIIIIIIIIRT {
     public int distanceToTics(double d) {
         //d is centimeters want to travel
         //divides the distance yoi want to got by circumfrance to get number of motor rotations necessary then converts to number to tics needed to do so
-        return (int) (d / WHEEL_CIRCUMFRENCE * MOTOR_TICK_COUNT * GEER_RATIO * 2);
+        return (int) (d / WHEEL_CIRCUMFRENCE * MOTOR_TICK_COUNT * GEER_RATIO);
     }
 
     public void initalize(DcMotor RF, DcMotor RB, DcMotor LF, DcMotor LB, double powerCap) {
@@ -180,8 +180,6 @@ public class SKIIIIIIIIIRT {
             //calculates how much each motor needs to move
             Specialdistanjce = (int)(Math.sqrt((x * x) + (y * y)));
 
-
-
             if(specialPower == 45){
                 specialPower = 0;
                 PerfectStrafe = true;
@@ -191,6 +189,8 @@ public class SKIIIIIIIIIRT {
             }else{
                 specialPower = -specialPower / 45 +1;
             }
+
+            Specialdistanjce = (int)(Specialdistanjce + Specialdistanjce * 3 * specialPower);
 
             if(swapped){
                 int placeholder = x;
