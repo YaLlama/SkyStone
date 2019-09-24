@@ -249,7 +249,7 @@ public class Autonymus extends LinearOpMode {
             //calculates how much each motor needs to move
             Specialdistanjce = (int)(Math.sqrt((x * x) + (y * y)));
             // currently wronmg needs to be fixed
-            specialPower = Math.abs(Math.toDegrees(Math.atan((double)y/(double)x)));
+            specialPower = Math.toDegrees(Math.atan(Math.abs((double)y/(double)x)));
 
 
             if(specialPower == 45){
