@@ -523,10 +523,18 @@ public class Autonymus extends LinearOpMode {
         telemetry.addData("Status", "Started");
         telemetry.update();
         Thread.sleep(100);
-        
+        moveTo(45, 45);
+        moveTo(-45, -45);
+        moveTo(60, 30);
+        moveTo(-60, -30);
+        moveTo(30, 60);
+        moveTo(-30, -60);
         moveTo(-45, 45);
         moveTo(45, -45);
-
+        moveTo(-30, 60);
+        moveTo(30, -60);
+        moveTo(-30, 60);
+        moveTo(30, -60);
 
         telemetry.addData("Status", "Done");
         telemetry.update();
