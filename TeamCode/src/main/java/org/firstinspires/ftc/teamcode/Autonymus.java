@@ -15,7 +15,7 @@ import java.lang.*;
 
 
 @Autonomous(name="Autonymus")
-public class Autonymus extends LinearOpMode {
+public class Autonymus {
 
 
     //VARIABLES
@@ -28,16 +28,12 @@ public class Autonymus extends LinearOpMode {
     //robot staring location
     private int robotX = 0;
     private int robotY = 0;
-    //robot direction facing
-    private int direction = 0;
 
+    //for moving command
     boolean swapped = false;
 
     // case for movement command
     private int Case = 0;
-
-    // gyro things
-    private BNO055IMU hero;
 
     //declaring motors
     private DcMotor rightFront;
@@ -83,12 +79,12 @@ public class Autonymus extends LinearOpMode {
 
 
 
-    public void initalize() {
+    public void initalize(DcMotor RF, DcMotor RB, DcMotor LF, DcMotor LB) {
         //declaring motors
-        rightFront = hardwareMap.dcMotor.get("rightFront");
-        leftFront = hardwareMap.dcMotor.get("leftFront");
-        rightBack = hardwareMap.dcMotor.get("rightBack");
-        leftBack = hardwareMap.dcMotor.get("leftBack");
+        rightFront = RF;
+        leftFront = LF;
+        rightBack = RB;
+        leftBack = LB;
 
         leftBack.setDirection(DcMotor.Direction.FORWARD);
         rightBack.setDirection(DcMotor.Direction.REVERSE);
@@ -100,18 +96,6 @@ public class Autonymus extends LinearOpMode {
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        //IMU stuff
-        BNO055IMU.Parameters gyro_parameters = new BNO055IMU.Parameters();
-        gyro_parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        gyro_parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        gyro_parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample Opmode
-        gyro_parameters.loggingEnabled = true;
-        gyro_parameters.loggingTag = "IMU";
-        gyro_parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-        hero = hardwareMap.get(BNO055IMU.class, "hero"); //The name of our heroic IMU
-        hero.initialize(gyro_parameters);
-        hero.startAccelerationIntegration(new Position(), new Velocity(), 1000);
-
         //setting motors to fun with encoders
         leftFront.setPower(0);
         rightFront.setPower(0);
@@ -121,9 +105,7 @@ public class Autonymus extends LinearOpMode {
         leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
+        leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);p
 
     }
 
@@ -188,11 +170,7 @@ public class Autonymus extends LinearOpMode {
             double rb = rightBack.getCurrentPosition();
             double lf = leftFront.getCurrentPosition();
             double rf = rightFront.getCurrentPosition();
-            telemetry.addData("Left Front",lf  );
-            telemetry.addData("Left Back", lb);
-            telemetry.addData("Right Front", rf);
-            telemetry.addData("Right Back", rb);
-            telemetry.update();
+
             try{
                 Thread.sleep(80);
             }catch(Exception e){
@@ -279,8 +257,9 @@ public class Autonymus extends LinearOpMode {
                 //set motor diances
                 distanceRF = Specialdistanjce;
                 distanceLB = Specialdistanjce;
-                distanceLF = (int) (Specialdistanjce * specialPower);
-                distanceRB = (int) (Specialdistanjce * specialPower);
+                distanceLF = (int) -(Specialdistanjce * specialPower);
+                distanceRB = (int) -(Specialdistanjce * specialPower);
+
             }else if(Case == 2){
                 //motor power levels
                 PowerLF = POWER_FACTOR;
@@ -319,8 +298,8 @@ public class Autonymus extends LinearOpMode {
                 //set motor diances
                 distanceRF = -Specialdistanjce;
                 distanceLB = -Specialdistanjce;
-                distanceLF = (int) (Specialdistanjce * specialPower);
-                distanceRB = (int) (Specialdistanjce * specialPower);
+                distanceLF = (int) -(Specialdistanjce * specialPower);
+                distanceRB = (int) -(Specialdistanjce * specialPower);
 
             }else if(Case == 5){
                 //motor power levels
@@ -332,8 +311,8 @@ public class Autonymus extends LinearOpMode {
                 //set motor diances
                 distanceRF = -Specialdistanjce;
                 distanceLB = -Specialdistanjce;
-                distanceLF = (int) -(Specialdistanjce * specialPower);
-                distanceRB = (int) -(Specialdistanjce * specialPower);
+                distanceLF = (int) (Specialdistanjce * specialPower);
+                distanceRB = (int) (Specialdistanjce * specialPower);
 
             }else if(Case == 6){
                 //motor power levels
@@ -370,8 +349,8 @@ public class Autonymus extends LinearOpMode {
                 //set motor diances
                 distanceRF = Specialdistanjce;
                 distanceLB = Specialdistanjce;
-                distanceLF = (int) -(Specialdistanjce * specialPower);
-                distanceRB = (int) -(Specialdistanjce * specialPower);
+                distanceLF = (int) (Specialdistanjce * specialPower);
+                distanceRB = (int) (Specialdistanjce * specialPower);
             }
 
         }
@@ -394,15 +373,13 @@ public class Autonymus extends LinearOpMode {
         leftBack.setPower(PowerLB);
 
         if(PerfectStrafe){
-            if(y/x > 0){
+            if(Case == 2 || Case == 7 || Case == 3 || Case == 6){
                 while (leftFront.isBusy() && rightBack.isBusy()) {
                     try{
                         Thread.sleep(80);
                     }catch(Exception e){
                         System.out.print(e);
                     }
-                    telemetry.addData("working", true);
-                    telemetry.update();
                 }
             }else{
                 while (rightFront.isBusy() && leftBack.isBusy()) {
@@ -411,8 +388,6 @@ public class Autonymus extends LinearOpMode {
                     }catch(Exception e){
                         System.out.print(e);
                     }
-                    telemetry.addData("working", true);
-                    telemetry.update();
                 }
             }
         }else{
@@ -422,13 +397,8 @@ public class Autonymus extends LinearOpMode {
                 }catch(Exception e){
                     System.out.print(e);
                 }
-                telemetry.addData("working", true);
-                telemetry.update();
             }
         }
-        telemetry.addData("done", true);
-        telemetry.update();
-
 
         //stops everything
         leftFront.setPower(0);
@@ -463,19 +433,15 @@ public class Autonymus extends LinearOpMode {
             if (y >= 0) {
                 if(x < 0){
                     Case = 1;
-                    telemetry.addData("case", 1);
                 }else{
                     Case = 2;
-                    telemetry.addData("case", 2);
                 }
 
             } else {
                 if(x < 0){
                     Case = 6;
-                    telemetry.addData("case", 6);
                 }else{
                     Case = 5;
-                    telemetry.addData("case", 5);
                 }
 
             }
@@ -483,24 +449,19 @@ public class Autonymus extends LinearOpMode {
             if (x > 0) {
                 if(y < 0){
                     Case = 4;
-                    telemetry.addData("case", 7);
                 }else{
                     Case = 3;
-                    telemetry.addData("case", 8);
                 }
 
             } else {
                 if(y < 0){
                     Case = 7;
-                    telemetry.addData("case", 4);
                 }else{
                     Case = 8;
-                    telemetry.addData("case", 3);
                 }
 
             }
         }
-        telemetry.update();
         x = Math.abs(x);
         y = Math.abs(y);
 
@@ -512,25 +473,6 @@ public class Autonymus extends LinearOpMode {
         }
 
         move(x, y);
-    }
-
-
-    @Override
-    public void runOpMode() throws InterruptedException {
-        initalize();
-
-        waitForStart();
-        telemetry.addData("Status", "Started");
-        telemetry.update();
-        Thread.sleep(100);
-        
-        moveTo(-45, 45);
-        moveTo(45, -45);
-
-
-        telemetry.addData("Status", "Done");
-        telemetry.update();
-        //making sure shit works
     }
 
 }
