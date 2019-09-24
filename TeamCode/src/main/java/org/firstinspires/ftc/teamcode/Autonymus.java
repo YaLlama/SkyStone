@@ -530,6 +530,7 @@ public class Autonymus extends LinearOpMode {
 
         telemetry.addData("Status", "Done");
         telemetry.update();
+        //making sure shit works
     }
 
 }
