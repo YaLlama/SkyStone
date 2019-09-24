@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import java.lang.*;
 
-public class Autonymus {
+public class SKIIIIIIIIIRT {
 
     //VARIABLES
     //
@@ -42,7 +42,7 @@ public class Autonymus {
     static final double WHEEL_CIRCUMFRENCE = Math.PI * WHEEL_DIAMETER;
 
     //Power limit
-    static final double POWER_FACTOR = .6;
+    public double POWER_FACTOR;
 
     //number of rotations of wheels to move wheel (circumference) at 45degree strafe
     static final int STRAFE_FACTOR = 2;
@@ -63,12 +63,13 @@ public class Autonymus {
         return (int) (d / WHEEL_CIRCUMFRENCE * MOTOR_TICK_COUNT * GEER_RATIO);
     }
 
-    public void initalize(DcMotor RF, DcMotor RB, DcMotor LF, DcMotor LB) {
+    public void initalize(DcMotor RF, DcMotor RB, DcMotor LF, DcMotor LB, double powerCap) {
         //declaring motors
         rightFront = RF;
         leftFront = LF;
         rightBack = RB;
         leftBack = LB;
+        POWER_FACTOR = powerCap;
 
         leftBack.setDirection(DcMotor.Direction.FORWARD);
         rightBack.setDirection(DcMotor.Direction.REVERSE);
