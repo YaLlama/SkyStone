@@ -25,10 +25,10 @@ public class SKIIIIIIIIIRT {
     public int Case = 0;
 
     //declaring motors
-    private DcMotor rightFront;
-    private DcMotor leftFront;
-    private DcMotor rightBack;
-    private DcMotor leftBack;
+    private static DcMotor rightFront;
+    private static DcMotor leftFront;
+    private static DcMotor rightBack;
+    private static DcMotor leftBack;
 
     //importing other stuff
 
@@ -190,7 +190,7 @@ public class SKIIIIIIIIIRT {
                 specialPower = -specialPower / 45 +1;
             }
 
-            Specialdistanjce = (int)(Specialdistanjce + Specialdistanjce * 3 * specialPower);
+            Specialdistanjce = (int)(Specialdistanjce + Specialdistanjce * 3 * (1 - specialPower));
 
             if(swapped){
                 int placeholder = x;
