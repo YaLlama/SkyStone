@@ -84,7 +84,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
 
 
 @TeleOp(name="SKYSTONE Vuforia Nav", group ="Concept")
-@Disabled
+
 public class ConceptVuforiaSkyStoneNavigation extends LinearOpMode {
 
     // IMPORTANT:  For Phone Camera, set 1) the camera source and 2) the orientation, based on how your phone is mounted:
@@ -118,7 +118,7 @@ public class ConceptVuforiaSkyStoneNavigation extends LinearOpMode {
 
     // Constant for Stone Target
     private static final float stoneZ = 2.00f * mmPerInch;
-
+    SKIIIIIIIIIRT swerve = new SKIIIIIIIIIRT();
     // Constants for the center support targets
     private static final float bridgeZ = 6.42f * mmPerInch;
     private static final float bridgeY = 23 * mmPerInch;
@@ -137,10 +137,54 @@ public class ConceptVuforiaSkyStoneNavigation extends LinearOpMode {
     private float phoneXRotate    = 0;
     private float phoneYRotate    = 0;
     private float phoneZRotate    = 0;
-    SKIIIIIIIIIRT skirty = new SKIIIIIIIIIRT();
+    
+    
+    private void rotatePID(int degree) throws InterruptedException {
+        PID miniPID;
 
+        miniPID = new PID(0.23, 0.050, 0.35);
+        miniPID.setOutputLimits(10);
+        //miniPID.setMaxIOutput(2);
+        //miniPID.setOutputRampRate(3);
+        //miniPID.setOutputFilter(.3);
+        miniPID.setSetpointRange(40);
+
+        double target = degree;
+
+        double actual = 0;
+        double output = 0;
+        miniPID.setSetpoint(0);
+        miniPID.setSetpoint(target);
+
+        while (opModeIsActive()) {
+            actual = getHeading();
+
+            if (actual < target + 2 && actual > target - 2) {
+                break;
+            }
+
+            double update = miniPID.getOutput(actual, target);
+            update = update / 26;
+            telemetry.addData("PID Update", update);
+            telemetry.addData("Target", target);
+            telemetry.addData("Heading", actual);
+            telemetry.update();
+            //telemetry displays all values ^^^
+            leftFrontMotor.setPower(-update);
+            leftBackMotor.setPower(-update);
+            rightFrontMotor.setPower(update);
+            rightBackMotor.setPower(update);
+
+            Thread.sleep(100);
+        }
+
+        leftFrontMotor.setPower(0);
+        leftBackMotor.setPower(0);
+        rightFrontMotor.setPower(0);
+        rightBackMotor.setPower(0);
+    }
     @Override public void runOpMode() {
-        SKIIIIIIIIIRT swerve = new SKIIIIIIIIIRT();
+        
         DcMotor RF = hardwareMap.dcMotor.get("rightFront");
         DcMotor RB = hardwareMap.dcMotor.get("rightBack");
         DcMotor LF = hardwareMap.dcMotor.get("leftFront");
@@ -152,9 +196,12 @@ public class ConceptVuforiaSkyStoneNavigation extends LinearOpMode {
          * If no camera monitor is desired, use the parameter-less constructor instead (commented out below).
          */
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+        VuforiaLocalizer.Parameters parameters = 
+	
+	
+	VuforiaLocalizer.Parameters(cameraMonitorViewId);
 
-        // VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+        // VuforiaLocalizer.Parameters parameters = VuforiaLocalizer.Parameters();
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
         parameters.cameraDirection   = CAMERA_CHOICE;
