@@ -1,13 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
-//* Copyright (c) 2019 FIRST. All rights reserved.
-
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -39,7 +38,6 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  *
  * From the Audience perspective, the Red Alliance station is on the right and the
  * Blue Alliance Station is on the left.
-
  * Eight perimeter targets are distributed evenly around the four perimeter walls
  * Four Bridge targets are located on the bridge uprights.
  * Refer to the Field Setup manual for more specific location details
@@ -59,8 +57,15 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  */
 
 
-@TeleOp(name="ParthVugfoira", group ="Linear Opmode")
-public class VuforiaTest extends LinearOpMode {
+@TeleOp(name="NewAuto123")
+
+
+public class NewAuto extends LinearOpMode {
+
+    private DcMotor RF;
+    private DcMotor RB ;
+    private DcMotor LF;
+    private DcMotor LB;
 
     // IMPORTANT:  For Phone Camera, set 1) the camera source and 2) the orientation, based on how your phone is mounted:
     // 1) Camera Source.  Valid choices are:  BACK (behind screen) or FRONT (selfie side)
@@ -84,7 +89,7 @@ public class VuforiaTest extends LinearOpMode {
      * and paste it in to your code on the next line, between the double quotes.
      */
     private static final String VUFORIA_KEY =
-            "ASIf+zH/////AAABmd0NjmuXkklAp6IxbSEz0QspOdBdMwZ0VqYymDEq1CZDOVFXWE0FhFzInNrFLn4QQdq7p9ALKS+31mddrBuWPJpb+XVaNFs/OgotNWh8rjqn2Uk6f6wMpHL08v5DZVZxklKWP6CdfCgu2eWqv4WY/Pb2eTEMP3Dou69EQUZFKuc5f/PMosKxukOWeQh7soTtc/QFBSNwsgUYu2yyJ2pmsRBTCNKNvfbCMQjdfh7V/TugMKsxq4XSyO0nCq2n2AtBxlcL6tC++BuP3ThutxaAC0gU9XcFGaCfy3SlVQGer1lmjEdRQEV1S+VYqzcakkfgEte6WkQ3q+TnDLu1xSFf1svFIWMjMLoJNp6/kL8VhlN8";
+            "ASIf+zH/////AAABmd0NjmuXkklAp6IxbSEz0QspOdBdMwZ0VqYymDEq1CZDOVFXWE0FhFzInNrFLn4QQdq7p9ALKS+31mddrBuWPJpb+XVaNFs/OgotNWh8rjqn2Uk6f6wMpHL08v5DZVZxklKWP6CdfCgu2eWqv4WY/Pb2eTEMP3Dou69EQUZFKuc5f/PMosKxukOWeQh7soTtc/QFBSNwsgUYu2yyJ2pmsRBTCNKNvfbCMQjdfh7V/TugMKsxq4XSyO0nCq2n2AtBxlcL6tC++BuP3ThutxaAC0gU9XcFGaCfy3SlVQGer1lmjEdRQEV1S+VYqzcakkfgEte6WkQ3q+TnDLu1xSFf1svFIWMjMLoJNp6/kL8VhlN8   ";
 
     // Since ImageTarget trackables use mm to specifiy their dimensions, we must use mm for all the physical dimension.
     // We will define some constants and conversions here
@@ -112,19 +117,12 @@ public class VuforiaTest extends LinearOpMode {
     private float phoneXRotate    = 0;
     private float phoneYRotate    = 0;
     private float phoneZRotate    = 0;
-    private SKIIIIIIIIIRT skirty = new SKIIIIIIIIIRT();
 
-    @Override
-    public void runOpMode()throws InterruptedException {
-        telemetry.addData("Status", "running");
-        SKIIIIIIIIIRT swerve = new SKIIIIIIIIIRT();
-        DcMotor RF = hardwareMap.dcMotor.get("rightFront");
-        DcMotor RB = hardwareMap.dcMotor.get("rightBack");
-        DcMotor LF = hardwareMap.dcMotor.get("leftFront");
-        DcMotor LB = hardwareMap.dcMotor.get("leftBack");
-        swerve.initalize(RF, RB, LF, LB, 0.3);
-        telemetry.addData("Status", "motors initited");
-        /*
+    @Override public void runOpMode() {
+
+
+
+            /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
          * We can pass Vuforia the handle to a camera preview resource (on the RC phone);
          * If no camera monitor is desired, use the parameter-less constructor instead (commented out below).
@@ -297,14 +295,22 @@ public class VuforiaTest extends LinearOpMode {
         // CONSEQUENTLY do not put any driving commands in this loop.
         // To restore the normal opmode structure, just un-comment the following line:
 
-        // waitForStart();
+         RF = hardwareMap.dcMotor.get("rightFront");
+         RB = hardwareMap.dcMotor.get("rightBack");
+         LF = hardwareMap.dcMotor.get("leftFront");
+         LB = hardwareMap.dcMotor.get("leftBack");
+
+        RF.setDirection(DcMotorSimple.Direction.REVERSE);
+        RB.setDirection(DcMotorSimple.Direction.REVERSE);
+        waitForStart();
 
         // Note: To use the remote camera preview:
         // AFTER you hit Init on the Driver Station, use the "options menu" to select "Camera Stream"
         // Tap the preview window to receive a fresh image.
-        telemetry.addData("Status", "shud be moving");
-        skirty.moveTo(0,100);
-        telemetry.addData("Status", "shud be done moving");
+        LB.setPower(0.1);
+        LF.setPower(0.1);
+        RB.setPower(0.1);
+        RF.setPower(0.1);
         targetsSkyStone.activate();
         while (!isStopRequested()) {
 
@@ -315,18 +321,16 @@ public class VuforiaTest extends LinearOpMode {
                     telemetry.addData("Visible Target", trackable.getName());
                     targetVisible = true;
 
+                    if (trackable.getName().equals("Stone Target")){
 
+                        telemetry.addLine("Found Target ppp");
+                        LB.setPower(0);
+                        LF.setPower(0);
+                        RB.setPower(0);
+                        RF.setPower(0);
 
-
-                 telemetry.addData("Status", "not found and going");
-                 if (trackable.getName().equals("Stone Target")){
-
-                     telemetry.addData("Status", "Stopplz");
                     }
-
-
-
-                    // getUpdatedRobotLocation() will return null if no new information is available since
+                    // getUpdatedRobotLocatio  n() will return null if no new information is available since
                     // the last time that call was made, or if the trackable is not currently visible.
                     OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener)trackable.getListener()).getUpdatedRobotLocation();
                     if (robotLocationTransform != null) {
@@ -357,4 +361,3 @@ public class VuforiaTest extends LinearOpMode {
         targetsSkyStone.deactivate();
     }
 }
-

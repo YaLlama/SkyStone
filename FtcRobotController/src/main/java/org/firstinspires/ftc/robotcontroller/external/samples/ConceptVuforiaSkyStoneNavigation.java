@@ -83,7 +83,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  */
 
 
-@TeleOp(name="bet", group ="Concept")
+@TeleOp(name="badone", group ="Concept")
 
 public class ConceptVuforiaSkyStoneNavigation extends LinearOpMode {
 
