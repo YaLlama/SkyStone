@@ -295,22 +295,25 @@ public class NewAuto extends LinearOpMode {
         // CONSEQUENTLY do not put any driving commands in this loop.
         // To restore the normal opmode structure, just un-comment the following line:
 
-         RF = hardwareMap.dcMotor.get("rightFront");
-         RB = hardwareMap.dcMotor.get("rightBack");
-         LF = hardwareMap.dcMotor.get("leftFront");
-         LB = hardwareMap.dcMotor.get("leftBack");
-
-        RF.setDirection(DcMotorSimple.Direction.REVERSE);
-        RB.setDirection(DcMotorSimple.Direction.REVERSE);
+        SKIIIIIIIIIRT swerve = new SKIIIIIIIIIRT();
+        DcMotor RF = hardwareMap.dcMotor.get("rightFront");
+        DcMotor RB = hardwareMap.dcMotor.get("rightBack");
+        DcMotor LF = hardwareMap.dcMotor.get("leftFront");
+        DcMotor LB = hardwareMap.dcMotor.get("leftBack");
+        swerve.initalize(RF, RB, LF, LB, 1);
+        
+        telemetry.addData("initialized: ", true);
+       
         waitForStart();
 
         // Note: To use the remote camera preview:
         // AFTER you hit Init on the Driver Station, use the "options menu" to select "Camera Stream"
         // Tap the preview window to receive a fresh image.
-        LB.setPower(0.1);
-        LF.setPower(0.1);
-        RB.setPower(0.1);
-        RF.setPower(0.1);
+        //LB.setPower(0.1);
+        //LF.setPower(0.1);
+        //RB.setPower(0.1);
+        //RF.setPower(0.1);
+        swerve.moveTo(0, 10);
         targetsSkyStone.activate();
         while (!isStopRequested()) {
 
@@ -328,6 +331,8 @@ public class NewAuto extends LinearOpMode {
                         LF.setPower(0);
                         RB.setPower(0);
                         RF.setPower(0);
+                        swerve.moveTo(0, -2);
+                        swerve.moveTo(-20, 0);
 
                     }
                     // getUpdatedRobotLocatio  n() will return null if no new information is available since
