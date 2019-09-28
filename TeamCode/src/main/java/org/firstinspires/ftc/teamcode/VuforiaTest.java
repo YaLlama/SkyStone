@@ -112,7 +112,6 @@ public class VuforiaTest extends LinearOpMode {
     private float phoneXRotate    = 0;
     private float phoneYRotate    = 0;
     private float phoneZRotate    = 0;
-    private SKIIIIIIIIIRT skirty = new SKIIIIIIIIIRT();
 
     @Override
     public void runOpMode()throws InterruptedException {
@@ -303,7 +302,7 @@ public class VuforiaTest extends LinearOpMode {
         // AFTER you hit Init on the Driver Station, use the "options menu" to select "Camera Stream"
         // Tap the preview window to receive a fresh image.
         telemetry.addData("Status", "shud be moving");
-        skirty.moveTo(0,100);
+        swerve.moveTo(0,100);
         telemetry.addData("Status", "shud be done moving");
         targetsSkyStone.activate();
         while (!isStopRequested()) {

@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import java.lang.*;
 
-public class SKIIIIIIIIIRT {
+public class SKIIIIIIIIIRT{
 
     //VARIABLES
     //
