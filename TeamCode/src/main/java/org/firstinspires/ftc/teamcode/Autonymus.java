@@ -310,8 +310,7 @@ public class Autonymus extends LinearOpMode {
                 telemetry.addData("special power", PowerRF);
                 telemetry.addData("short distance", distanceLF);
                 telemetry.addData("long distance", distanceLB);
-                telemetry.update();
-// hell owrold
+
             }else if(Case == 6){
                 //motor power levels
                 PowerRF = -POWER_FACTOR;
