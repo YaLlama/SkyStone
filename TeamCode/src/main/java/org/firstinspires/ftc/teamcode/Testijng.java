@@ -10,7 +10,7 @@ public class Testijng extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        SKIIIIIIIIIRT swerve = new SKIIIIIIIIIRT();
+        SKIRT swerve = new SKIRT();
         DcMotor RF = hardwareMap.dcMotor.get("rightFront");
         DcMotor RB = hardwareMap.dcMotor.get("rightBack");
         DcMotor LF = hardwareMap.dcMotor.get("leftFront");
@@ -18,7 +18,7 @@ public class Testijng extends LinearOpMode {
         swerve.initalize(RF, RB, LF, LB, 0.6);
         telemetry.addData("initalized: ", true);
         waitForStart();
-        swerve.moveTo(45, 60);
+        swerve.move(245, 260);
 
     }
 }

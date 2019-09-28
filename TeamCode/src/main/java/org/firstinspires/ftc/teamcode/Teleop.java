@@ -19,12 +19,6 @@ public class Teleop extends OpMode {
     double m1, m2, m3, m4;
     double x1, x2, y1, y2, s1, s2, s3;
 
-    private double rtrigpos = 0;
-    private double lefty = 0;
-    private double righty = 0;
-    private double lastrighty = 0;
-    private boolean dpadtouch = false;
-    private boolean apress = false;
     //s1 anmd s2w are slowing variables.
     @Override
     public void init() {
@@ -43,20 +37,6 @@ public class Teleop extends OpMode {
         leftBackMotor.setPower(0);
         rightFrontMotor.setPower(0);
         rightBackMotor.setPower(0);
-
-
-    }
-
-    @Override
-    public void init_loop() {
-        /*telemetry.addData("y1", y1);
-        telemetry.addData("y2", y2);
-        telemetry.addData("x1", x1);
-        telemetry.addData("x2", x2);
-        telemetry.addData("fl", m1);
-        telemetry.addData("bl", m2);
-        telemetry.addData("rf ", m3);
-        telemetry.addData("rb", m4);*/
 
 
     }
