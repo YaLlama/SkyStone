@@ -121,7 +121,7 @@ public class VuforiaTest extends LinearOpMode {
         DcMotor RB = hardwareMap.dcMotor.get("rightBack");
         DcMotor LF = hardwareMap.dcMotor.get("leftFront");
         DcMotor LB = hardwareMap.dcMotor.get("leftBack");
-        swerve.initalize(RF, RB, LF, LB, 0.3);
+        swerve.initalize(RF, RB, LF, LB);
         telemetry.addData("Status", "motors initited");
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.

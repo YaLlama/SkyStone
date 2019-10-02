@@ -300,7 +300,7 @@ public class NewAuto extends LinearOpMode {
         DcMotor RB = hardwareMap.dcMotor.get("rightBack");
         DcMotor LF = hardwareMap.dcMotor.get("leftFront");
         DcMotor LB = hardwareMap.dcMotor.get("leftBack");
-        swerve.initalize(RF, RB, LF, LB, 1);
+        swerve.initalize(RF, RB, LF, LB);
         
         telemetry.addData("initialized: ", true);
        

@@ -23,10 +23,10 @@ public class SKIRT {
     public int Case = 0;
 
     //declaring motors
-    private static DcMotor rightFront;
-    private static DcMotor leftFront;
-    private static DcMotor rightBack;
-    private static DcMotor leftBack;
+    public static DcMotor rightFront;
+    public static DcMotor leftFront;
+    public static DcMotor rightBack;
+    public static DcMotor leftBack;
 
     //importing other stuff
 
@@ -40,13 +40,11 @@ public class SKIRT {
     static final double WHEEL_CIRCUMFRENCE = Math.PI * WHEEL_DIAMETER;
 
     //Power limit
-    public double POWER_FACTOR;
+    public static double POWER_FACTOR;
 
     //gear ratio wheel divided by motor
     static final double GEER_RATIO = 4/3;
 
-    //for moving on slope
-    static boolean continuous = false;
 
 
     //SHORTCUTS / COMMANDS
@@ -67,7 +65,6 @@ public class SKIRT {
         leftFront = LF;
         rightBack = RB;
         leftBack = LB;
-
 
         leftBack.setDirection(DcMotor.Direction.FORWARD);
         rightBack.setDirection(DcMotor.Direction.REVERSE);
@@ -141,14 +138,6 @@ public class SKIRT {
         rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
-    public void continuousFalse(){
-        //sets motors to move until redirected
-        continuous = false;
-    }
-    public void continuousTrue(){
-        //stops motors and resets to normal movement
-        continuous = true;
-    }
 
     public void move(int x, int y, double power) {
         // x and y are distances in centimeters
@@ -156,6 +145,7 @@ public class SKIRT {
 
         //creating variables for distances each motor needs to travel and power levels and special stuff
         double correcction = power / 6;
+        POWER_FACTOR = power;
 
         int distanceLF;
         int distanceLB;
@@ -384,7 +374,7 @@ public class SKIRT {
 
                 if (Case == 2 || Case == 7 || Case == 3 || Case == 6) {
 
-                    while (leftFront.getCurrentPosition() < distanceToTics(distanceLF) || rightBack.getCurrentPosition() < distanceToTics(distanceRB) || continuous) {
+                    while (leftFront.getCurrentPosition() < distanceToTics(distanceLF) || rightBack.getCurrentPosition() < distanceToTics(distanceRB)) {
 
                         if (leftFront.getCurrentPosition() == rightBack.getCurrentPosition()) {
 
@@ -397,7 +387,7 @@ public class SKIRT {
                         }
                     }
                 } else {
-                    while (rightFront.getCurrentPosition() < distanceToTics(distanceRF) || leftBack.getCurrentPosition() < distanceToTics(distanceLB) || continuous) {
+                    while (rightFront.getCurrentPosition() < distanceToTics(distanceRF) || leftBack.getCurrentPosition() < distanceToTics(distanceLB)) {
                         if (rightFront.getCurrentPosition() == leftBack.getCurrentPosition()) {
 
                         } else if (rightFront.getCurrentPosition() < leftBack.getCurrentPosition()) {
@@ -410,7 +400,7 @@ public class SKIRT {
                     }
                 }
             } else {
-                while (rightFront.getCurrentPosition() + rightBack.getCurrentPosition() < distanceToTics(distanceRF + distanceRB) || leftBack.getCurrentPosition() + leftFront.getCurrentPosition() < distanceToTics(distanceLB + distanceLF) || continuous) {
+                while (rightFront.getCurrentPosition() + rightBack.getCurrentPosition() < distanceToTics(distanceRF + distanceRB) || leftBack.getCurrentPosition() + leftFront.getCurrentPosition() < distanceToTics(distanceLB + distanceLF)) {
 
                     if (rightFront.getCurrentPosition() + rightBack.getCurrentPosition() == leftBack.getCurrentPosition() + leftFront.getCurrentPosition()) {
 
