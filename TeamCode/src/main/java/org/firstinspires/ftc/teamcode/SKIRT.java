@@ -144,7 +144,7 @@ public class SKIRT {
 
 
         //creating variables for distances each motor needs to travel and power levels and special stuff
-        double correcction = .1;
+        double correcction = POWER_FACTOR / 6;
 
         int distanceLF;
         int distanceLB;
@@ -374,7 +374,7 @@ public class SKIRT {
 
             if(Case == 2 || Case == 7 || Case == 3 || Case == 6){
 
-                while (leftFront.getCurrentPosition() < distanceLF || rightBack.getCurrentPosition() < distanceRB) {
+                while (leftFront.getCurrentPosition() < distanceToTics(distanceLF) || rightBack.getCurrentPosition() < distanceToTics(distanceRB)) {
 
                     if(leftFront.getCurrentPosition() == rightBack.getCurrentPosition()){
 
@@ -387,7 +387,7 @@ public class SKIRT {
                     }
                 }
             }else{
-                while (rightFront.getCurrentPosition() < distanceRF || leftBack.getCurrentPosition() < distanceLB) {
+                while (rightFront.getCurrentPosition() < distanceToTics(distanceRF) || leftBack.getCurrentPosition() < distanceToTics(distanceLB)) {
                     if(rightFront.getCurrentPosition() == leftBack.getCurrentPosition()){
 
                     } else if(rightFront.getCurrentPosition() < leftBack.getCurrentPosition()) {
@@ -400,7 +400,7 @@ public class SKIRT {
                 }
             }
         }else{
-            while (rightFront.getCurrentPosition() + rightBack.getCurrentPosition() < distanceRF + distanceRB || leftBack.getCurrentPosition() + leftFront.getCurrentPosition() < distanceLB + distanceLF) {
+            while (rightFront.getCurrentPosition() + rightBack.getCurrentPosition() < distanceToTics(distanceRF + distanceRB) || leftBack.getCurrentPosition() + leftFront.getCurrentPosition() < distanceToTics(distanceLB + distanceLF)) {
 
                 if(rightFront.getCurrentPosition() + rightBack.getCurrentPosition() == leftBack.getCurrentPosition() + leftFront.getCurrentPosition()){
 
