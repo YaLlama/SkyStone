@@ -45,6 +45,9 @@ public class SKIRT {
     //gear ratio wheel divided by motor
     static final double GEER_RATIO = 4/3;
 
+    //for moving on slope
+    static boolean continuous = false;
+
 
     //SHORTCUTS / COMMANDS
     //
@@ -58,13 +61,13 @@ public class SKIRT {
         return (int) (d / WHEEL_CIRCUMFRENCE * MOTOR_TICK_COUNT * GEER_RATIO);
     }
 
-    public void initalize(DcMotor RF, DcMotor RB, DcMotor LF, DcMotor LB, double powerCap) {
+    public void initalize(DcMotor RF, DcMotor RB, DcMotor LF, DcMotor LB) {
         //declaring motors
         rightFront = RF;
         leftFront = LF;
         rightBack = RB;
         leftBack = LB;
-        POWER_FACTOR = powerCap;
+
 
         leftBack.setDirection(DcMotor.Direction.FORWARD);
         rightBack.setDirection(DcMotor.Direction.REVERSE);
@@ -138,13 +141,21 @@ public class SKIRT {
         rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
+    public void continuousFalse(){
+        //sets motors to move until redirected
+        continuous = false;
+    }
+    public void continuousTrue(){
+        //stops motors and resets to normal movement
+        continuous = true;
+    }
 
-    public void move(int x, int y) {
+    public void move(int x, int y, double power) {
         // x and y are distances in centimeters
 
 
         //creating variables for distances each motor needs to travel and power levels and special stuff
-        double correcction = POWER_FACTOR / 6;
+        double correcction = power / 6;
 
         int distanceLF;
         int distanceLB;
@@ -163,40 +174,40 @@ public class SKIRT {
 
         //moves to desired x,y
         double slope;
-        if(x == 0){
+        if (x == 0) {
             slope = 0;
-        }else{
-            slope = (double)y / (double)x;
+        } else {
+            slope = (double) y / (double) x;
         }
 
         if (-1 <= slope && slope <= 1) {
             if (y >= 0) {
-                if(x < 0){
+                if (x < 0) {
                     Case = 1;
-                }else{
+                } else {
                     Case = 2;
                 }
 
             } else {
-                if(x < 0){
+                if (x < 0) {
                     Case = 6;
-                }else{
+                } else {
                     Case = 5;
                 }
 
             }
         } else {
             if (x > 0) {
-                if(y < 0){
+                if (y < 0) {
                     Case = 4;
-                }else{
+                } else {
                     Case = 3;
                 }
 
             } else {
-                if(y < 0){
+                if (y < 0) {
                     Case = 7;
-                }else{
+                } else {
                     Case = 8;
                 }
 
@@ -205,7 +216,7 @@ public class SKIRT {
         x = Math.abs(x);
         y = Math.abs(y);
 
-        if(x > y){
+        if (x > y) {
             int placeholder = x;
             x = y;
             y = placeholder;
@@ -220,42 +231,41 @@ public class SKIRT {
             distanceRF = y;
             distanceRB = y;
 
-            PowerLB = POWER_FACTOR;
-            PowerLF = POWER_FACTOR;
-            PowerRB = POWER_FACTOR;
-            PowerRF = POWER_FACTOR;
+            PowerLB = power;
+            PowerLF = power;
+            PowerRB = power;
+            PowerRF = power;
 
         } else {
             // currently wronmg needs to be fixed
-            specialPower = Math.toDegrees(Math.atan(Math.abs((double)y/(double)x)));
+            specialPower = Math.toDegrees(Math.atan(Math.abs((double) y / (double) x)));
             //calculates how much each motor needs to move
-            Specialdistanjce = (int)(Math.sqrt((x * x) + (y * y)));
+            Specialdistanjce = (int) (Math.sqrt((x * x) + (y * y)));
 
-            if(specialPower == 45){
+            if (specialPower == 45) {
                 specialPower = 0;
                 PerfectStrafe = true;
-            }
-            else if(specialPower > 45){
+            } else if (specialPower > 45) {
                 specialPower = specialPower / 45 - 1;
-            }else{
-                specialPower = -specialPower / 45 +1;
+            } else {
+                specialPower = -specialPower / 45 + 1;
             }
 
-            Specialdistanjce = (int)(Specialdistanjce + Specialdistanjce * 3 * (1 - specialPower));
+            Specialdistanjce = (int) (Specialdistanjce + Specialdistanjce * 3 * (1 - specialPower));
 
-            if(swapped){
+            if (swapped) {
                 int placeholder = x;
                 x = y;
                 y = placeholder;
                 swapped = false;
             }
 
-            if(Case == 1){
+            if (Case == 1) {
                 //motor power levels
-                PowerRF = POWER_FACTOR;
-                PowerLB = POWER_FACTOR;
-                PowerLF = -specialPower * POWER_FACTOR;
-                PowerRB = -specialPower * POWER_FACTOR;
+                PowerRF = power;
+                PowerLB = power;
+                PowerLF = -specialPower * power;
+                PowerRB = -specialPower * power;
 
                 //set motor diances
                 distanceRF = Specialdistanjce;
@@ -263,12 +273,12 @@ public class SKIRT {
                 distanceLF = (int) (Specialdistanjce * specialPower);
                 distanceRB = (int) (Specialdistanjce * specialPower);
 
-            }else if(Case == 2){
+            } else if (Case == 2) {
                 //motor power levels
-                PowerLF = POWER_FACTOR;
-                PowerRB = POWER_FACTOR;
-                PowerRF = specialPower * POWER_FACTOR;
-                PowerLB = specialPower * POWER_FACTOR;
+                PowerLF = power;
+                PowerRB = power;
+                PowerRF = specialPower * power;
+                PowerLB = specialPower * power;
 
 
                 //set motor diances
@@ -278,24 +288,24 @@ public class SKIRT {
                 distanceLB = (int) (Specialdistanjce * specialPower);
 
 
-            }else if(Case == 3){
+            } else if (Case == 3) {
                 //motor power levels
-                PowerLF = POWER_FACTOR;
-                PowerRB = POWER_FACTOR;
-                PowerRF = -specialPower * POWER_FACTOR;
-                PowerLB = -specialPower * POWER_FACTOR;
+                PowerLF = power;
+                PowerRB = power;
+                PowerRF = -specialPower * power;
+                PowerLB = -specialPower * power;
 
                 //set motor diances
                 distanceLF = Specialdistanjce;
                 distanceRB = Specialdistanjce;
                 distanceRF = (int) (Specialdistanjce * specialPower);
                 distanceLB = (int) (Specialdistanjce * specialPower);
-            }else if(Case == 4){
+            } else if (Case == 4) {
                 //motor power levels
-                PowerRF = -POWER_FACTOR;
-                PowerLB = -POWER_FACTOR;
-                PowerLF = -specialPower * POWER_FACTOR;
-                PowerRB = -specialPower * POWER_FACTOR;
+                PowerRF = -power;
+                PowerLB = -power;
+                PowerLF = -specialPower * power;
+                PowerRB = -specialPower * power;
 
 
                 //set motor diances
@@ -304,12 +314,12 @@ public class SKIRT {
                 distanceLF = (int) (Specialdistanjce * specialPower);
                 distanceRB = (int) (Specialdistanjce * specialPower);
 
-            }else if(Case == 5){
+            } else if (Case == 5) {
                 //motor power levels
-                PowerRF = -POWER_FACTOR;
-                PowerLB = -POWER_FACTOR;
-                PowerLF = specialPower * POWER_FACTOR;
-                PowerRB = specialPower * POWER_FACTOR;
+                PowerRF = -power;
+                PowerLB = -power;
+                PowerLF = specialPower * power;
+                PowerRB = specialPower * power;
 
                 //set motor diances
                 distanceRF = Specialdistanjce;
@@ -317,12 +327,12 @@ public class SKIRT {
                 distanceLF = (int) (Specialdistanjce * specialPower);
                 distanceRB = (int) (Specialdistanjce * specialPower);
 
-            }else if(Case == 6){
+            } else if (Case == 6) {
                 //motor power levels
-                PowerLF = -POWER_FACTOR;
-                PowerRB = -POWER_FACTOR;
-                PowerRF = -specialPower * POWER_FACTOR;
-                PowerLB = -specialPower * POWER_FACTOR;
+                PowerLF = -power;
+                PowerRB = -power;
+                PowerRF = -specialPower * power;
+                PowerLB = -specialPower * power;
 
                 //set motor diances
                 distanceLF = Specialdistanjce;
@@ -330,24 +340,24 @@ public class SKIRT {
                 distanceRF = (int) (Specialdistanjce * specialPower);
                 distanceLB = (int) (Specialdistanjce * specialPower);
 
-            }else if(Case == 7){
+            } else if (Case == 7) {
                 //motor power levels
-                PowerLF = -POWER_FACTOR;
-                PowerRB = -POWER_FACTOR;
-                PowerRF = specialPower * POWER_FACTOR;
-                PowerLB = specialPower * POWER_FACTOR;
+                PowerLF = -power;
+                PowerRB = -power;
+                PowerRF = specialPower * power;
+                PowerLB = specialPower * power;
 
                 //set motor diances
                 distanceLF = Specialdistanjce;
                 distanceRB = Specialdistanjce;
                 distanceRF = (int) (Specialdistanjce * specialPower);
                 distanceLB = (int) (Specialdistanjce * specialPower);
-            }else{
+            } else {
                 //motor power levels
-                PowerRF = POWER_FACTOR;
-                PowerLB = POWER_FACTOR;
-                PowerLF = specialPower * POWER_FACTOR;
-                PowerRB = specialPower * POWER_FACTOR;
+                PowerRF = power;
+                PowerLB = power;
+                PowerLF = specialPower * power;
+                PowerRB = specialPower * power;
 
                 //set motor diances
                 distanceRF = Specialdistanjce;
@@ -370,68 +380,68 @@ public class SKIRT {
         rightBack.setPower(PowerRB);
         leftBack.setPower(PowerLB);
 
-        if(PerfectStrafe){
+            if (PerfectStrafe) {
 
-            if(Case == 2 || Case == 7 || Case == 3 || Case == 6){
+                if (Case == 2 || Case == 7 || Case == 3 || Case == 6) {
 
-                while (leftFront.getCurrentPosition() < distanceToTics(distanceLF) || rightBack.getCurrentPosition() < distanceToTics(distanceRB)) {
+                    while (leftFront.getCurrentPosition() < distanceToTics(distanceLF) || rightBack.getCurrentPosition() < distanceToTics(distanceRB) || continuous) {
 
-                    if(leftFront.getCurrentPosition() == rightBack.getCurrentPosition()){
+                        if (leftFront.getCurrentPosition() == rightBack.getCurrentPosition()) {
 
-                    } else if(leftFront.getCurrentPosition() < rightBack.getCurrentPosition()) {
-                        leftFront.setPower(PowerLF + correcction);
-                        PowerLF = PowerLF + correcction;
-                    } else {
-                        leftFront.setPower(PowerRB + correcction);
-                        PowerRB = PowerRB + correcction;
+                        } else if (leftFront.getCurrentPosition() < rightBack.getCurrentPosition()) {
+                            leftFront.setPower(PowerLF + correcction);
+                            PowerLF = PowerLF + correcction;
+                        } else {
+                            leftFront.setPower(PowerRB + correcction);
+                            PowerRB = PowerRB + correcction;
+                        }
+                    }
+                } else {
+                    while (rightFront.getCurrentPosition() < distanceToTics(distanceRF) || leftBack.getCurrentPosition() < distanceToTics(distanceLB) || continuous) {
+                        if (rightFront.getCurrentPosition() == leftBack.getCurrentPosition()) {
+
+                        } else if (rightFront.getCurrentPosition() < leftBack.getCurrentPosition()) {
+                            rightFront.setPower(PowerRF + correcction);
+                            PowerRF = PowerRF + correcction;
+                        } else {
+                            leftBack.setPower(PowerLB + correcction);
+                            PowerLB = PowerLB + correcction;
+                        }
                     }
                 }
-            }else{
-                while (rightFront.getCurrentPosition() < distanceToTics(distanceRF) || leftBack.getCurrentPosition() < distanceToTics(distanceLB)) {
-                    if(rightFront.getCurrentPosition() == leftBack.getCurrentPosition()){
+            } else {
+                while (rightFront.getCurrentPosition() + rightBack.getCurrentPosition() < distanceToTics(distanceRF + distanceRB) || leftBack.getCurrentPosition() + leftFront.getCurrentPosition() < distanceToTics(distanceLB + distanceLF) || continuous) {
 
-                    } else if(rightFront.getCurrentPosition() < leftBack.getCurrentPosition()) {
+                    if (rightFront.getCurrentPosition() + rightBack.getCurrentPosition() == leftBack.getCurrentPosition() + leftFront.getCurrentPosition()) {
+
+                    } else if (rightFront.getCurrentPosition() + rightBack.getCurrentPosition() < leftBack.getCurrentPosition() + leftFront.getCurrentPosition()) {
                         rightFront.setPower(PowerRF + correcction);
+                        rightBack.setPower(PowerRB + correcction);
+
                         PowerRF = PowerRF + correcction;
+                        PowerRB = PowerRB + correcction;
                     } else {
                         leftBack.setPower(PowerLB + correcction);
+                        leftFront.setPower(PowerLF + correcction);
+
                         PowerLB = PowerLB + correcction;
+                        PowerLF = PowerLF + correcction;
                     }
                 }
-            }
-        }else{
-            while (rightFront.getCurrentPosition() + rightBack.getCurrentPosition() < distanceToTics(distanceRF + distanceRB) || leftBack.getCurrentPosition() + leftFront.getCurrentPosition() < distanceToTics(distanceLB + distanceLF)) {
 
-                if(rightFront.getCurrentPosition() + rightBack.getCurrentPosition() == leftBack.getCurrentPosition() + leftFront.getCurrentPosition()){
 
-                } else if(rightFront.getCurrentPosition() + rightBack.getCurrentPosition() < leftBack.getCurrentPosition() + leftFront.getCurrentPosition()) {
-                    rightFront.setPower(PowerRF + correcction);
-                    rightBack.setPower(PowerRB + correcction);
+            //stops everything
+            leftFront.setPower(0);
+            rightFront.setPower(0);
+            rightBack.setPower(0);
+            leftBack.setPower(0);
 
-                    PowerRF = PowerRF + correcction;
-                    PowerRB = PowerRB + correcction;
-                } else {
-                    leftBack.setPower(PowerLB + correcction);
-                    leftFront.setPower(PowerLF + correcction);
-
-                    PowerLB = PowerLB + correcction;
-                    PowerLF = PowerLF + correcction;
-                }
-            }
+            //Resets
+            leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
-
-        //stops everything
-        leftFront.setPower(0);
-        rightFront.setPower(0);
-        rightBack.setPower(0);
-        leftBack.setPower(0);
-
-        //Resets
-        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
 
         //tells us new location
         robotX += x;
