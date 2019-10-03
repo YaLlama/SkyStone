@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import java.lang.*;
 
-public class SKIIIIIIIIIRT {
+public class SKIIIIIIIIIRT{
 
     //VARIABLES
     //
@@ -60,13 +60,12 @@ public class SKIIIIIIIIIRT {
         return (int) (d / WHEEL_CIRCUMFRENCE * MOTOR_TICK_COUNT * GEER_RATIO);
     }
 
-    public void initalize(DcMotor RF, DcMotor RB, DcMotor LF, DcMotor LB, double powerCap) {
+    public void initalize(DcMotor RF, DcMotor RB, DcMotor LF, DcMotor LB) {
         //declaring motors
         rightFront = RF;
         leftFront = LF;
         rightBack = RB;
         leftBack = LB;
-        POWER_FACTOR = powerCap;
 
         leftBack.setDirection(DcMotor.Direction.FORWARD);
         rightBack.setDirection(DcMotor.Direction.REVERSE);
