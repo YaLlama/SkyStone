@@ -1,12 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -57,15 +54,9 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  */
 
 
-@TeleOp(name="NewAuto123")
+@TeleOp(name="SKYSTONE Vuforia Navwe  ")
 
-
-public class NewAuto extends LinearOpMode {
-
-    private DcMotor RF;
-    private DcMotor RB ;
-    private DcMotor LF;
-    private DcMotor LB;
+public class VuforiaNavplz extends LinearOpMode {
 
     // IMPORTANT:  For Phone Camera, set 1) the camera source and 2) the orientation, based on how your phone is mounted:
     // 1) Camera Source.  Valid choices are:  BACK (behind screen) or FRONT (selfie side)
@@ -74,7 +65,7 @@ public class NewAuto extends LinearOpMode {
     // NOTE: If you are running on a CONTROL HUB, with only one USB WebCam, you must select CAMERA_CHOICE = BACK; and PHONE_IS_PORTRAIT = false;
     //
     private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
-    private static final boolean PHONE_IS_PORTRAIT = false  ;
+    private static final boolean PHONE_IS_PORTRAIT = true ;
 
     /*
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
@@ -89,7 +80,7 @@ public class NewAuto extends LinearOpMode {
      * and paste it in to your code on the next line, between the double quotes.
      */
     private static final String VUFORIA_KEY =
-            "ASIf+zH/////AAABmd0NjmuXkklAp6IxbSEz0QspOdBdMwZ0VqYymDEq1CZDOVFXWE0FhFzInNrFLn4QQdq7p9ALKS+31mddrBuWPJpb+XVaNFs/OgotNWh8rjqn2Uk6f6wMpHL08v5DZVZxklKWP6CdfCgu2eWqv4WY/Pb2eTEMP3Dou69EQUZFKuc5f/PMosKxukOWeQh7soTtc/QFBSNwsgUYu2yyJ2pmsRBTCNKNvfbCMQjdfh7V/TugMKsxq4XSyO0nCq2n2AtBxlcL6tC++BuP3ThutxaAC0gU9XcFGaCfy3SlVQGer1lmjEdRQEV1S+VYqzcakkfgEte6WkQ3q+TnDLu1xSFf1svFIWMjMLoJNp6/kL8VhlN8   ";
+            "AffeYPj/////AAABmWVzOEi+Fkews+hH4D8WoWZxz/asemhsRtvnr+AI4kjnmcTmEC44PZBnFWWXAZ0SUmKh1SYJBUSj8CmRprXtdBLpBg02gOaCPPIGg1yBPOhqRHKEQwJe5OOxOYW3/EPEh7IvBs8QOS8p5pl7XsA5D0kanB20VoPMIZMJrmhg/TOhK1vEw/T/23rHtkoHVx/KB+bQN3P+3lNWQTITh1RXp1mrlxkDuc9M9X8/guHD+75t3YmOezQbzabIqSPXTgUZ4iiZi5F1pHjFdKJGXEEmtgd620uT7nyaqvpNP3SYgqLv5KpVO9bWUvwrmoMfGUYRZyIFYqTRQTfctrxnVwX431AnEWAwBRrBcwtmhrqiS6yT";
 
     // Since ImageTarget trackables use mm to specifiy their dimensions, we must use mm for all the physical dimension.
     // We will define some constants and conversions here
@@ -119,9 +110,6 @@ public class NewAuto extends LinearOpMode {
     private float phoneZRotate    = 0;
 
     @Override public void runOpMode() {
-
-
-
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
          * We can pass Vuforia the handle to a camera preview resource (on the RC phone);
@@ -295,26 +283,12 @@ public class NewAuto extends LinearOpMode {
         // CONSEQUENTLY do not put any driving commands in this loop.
         // To restore the normal opmode structure, just un-comment the following line:
 
-        RF = hardwareMap.dcMotor.get("rightFront");
-        RB = hardwareMap.dcMotor.get("rightBack");
-        LF = hardwareMap.dcMotor.get("leftFront");
-        LB = hardwareMap.dcMotor.get("leftBack");
-
-        RF.setDirection(DcMotorSimple.Direction.REVERSE);
-        RB.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        telemetry.addData("SDtatus", "waiting for start");
-
-        waitForStart();
+        // waitForStart();
 
         // Note: To use the remote camera preview:
         // AFTER you hit Init on the Driver Station, use the "options menu" to select "Camera Stream"
         // Tap the preview window to receive a fresh image.
-        swerve.movetwo(-100, 0);
-        LB.setPower(0.1);
-        LF.setPower(0.1);
-        RB.setPower(0.1);
-        RF.setPower(0.1);
+
         targetsSkyStone.activate();
         while (!isStopRequested()) {
 
@@ -323,18 +297,13 @@ public class NewAuto extends LinearOpMode {
             for (VuforiaTrackable trackable : allTrackables) {
                 if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible()) {
                     telemetry.addData("Visible Target", trackable.getName());
-                    targetVisible = true;
-
                     if (trackable.getName().equals("Stone Target")){
-
-                        telemetry.addLine("Found Target ppp");
-                        LB.setPower(0);
-                        LF.setPower(0);
-                        RB.setPower(0);
-                        RF.setPower(0);
+                        telemetry.addLine("Stone Target is visibleee");
 
                     }
-                    // getUpdatedRobotLocatio  n() will return null if no new information is available since
+                    targetVisible = true;
+
+                    // getUpdatedRobotLocation() will return null if no new information is available since
                     // the last time that call was made, or if the trackable is not currently visible.
                     OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener)trackable.getListener()).getUpdatedRobotLocation();
                     if (robotLocationTransform != null) {
@@ -343,14 +312,24 @@ public class NewAuto extends LinearOpMode {
                     break;
                 }
             }
-
+            String positionSkystone = "";
             // Provide feedback as to where the robot is located (if we know).
             if (targetVisible) {
                 // express position (translation) of robot in inches.
                 VectorF translation = lastLocation.getTranslation();
                 telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
                         translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
+                double xPosition = translation.get(1);
 
+                if (xPosition > -4){
+                    positionSkystone = "Left";
+                } else if (xPosition >-4 && xPosition <-11  ){
+                    positionSkystone = "Center";
+                } else if (xPosition < -11){
+                    positionSkystone = "Right";
+                } else{
+                    positionSkystone = "id ond eyou";
+                }
                 // express the rotation of the robot in degrees.
                 Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
                 telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
@@ -358,6 +337,7 @@ public class NewAuto extends LinearOpMode {
             else {
                 telemetry.addData("Visible Target", "none");
             }
+            telemetry.addData("Position", positionSkystone);
             telemetry.update();
         }
 
@@ -365,4 +345,3 @@ public class NewAuto extends LinearOpMode {
         targetsSkyStone.deactivate();
     }
 }
-
