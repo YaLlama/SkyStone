@@ -310,7 +310,6 @@ public class NewAuto extends LinearOpMode {
         // Note: To use the remote camera preview:
         // AFTER you hit Init on the Driver Station, use the "options menu" to select "Camera Stream"
         // Tap the preview window to receive a fresh image.
-        swerve.movetwo(-100, 0);
         LB.setPower(0.1);
         LF.setPower(0.1);
         RB.setPower(0.1);
