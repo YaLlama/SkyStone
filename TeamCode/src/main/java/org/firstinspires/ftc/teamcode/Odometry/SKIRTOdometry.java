@@ -22,9 +22,9 @@ public class SKIRTOdometry {
     public int Case = 0;
 
     //declaring motors
-    public static DcMotor rightFront;
-    public static DcMotor leftFront;
-    public static DcMotor rightBack;
+    public static DcMotor rightFrontEncoder;
+    public static DcMotor leftFrontEncoder;
+    public static DcMotor rightBackEncoder;
     public static DcMotor leftBack;
 
     //odomentry srtuff
@@ -74,30 +74,30 @@ public class SKIRTOdometry {
 
     public void initalize(DcMotor RFE, DcMotor RBE, DcMotor LFE, DcMotor LB) {
         //declaring motors
-        rightFront = RFE;
-        leftFront = LFE;
-        rightBack = RBE;
+        rightFrontEncoder = RFE;
+        leftFrontEncoder = LFE;
+        rightBackEncoder = RBE;
         leftBack = LB;
 
         leftBack.setDirection(DcMotor.Direction.FORWARD);
-        rightBack.setDirection(DcMotor.Direction.REVERSE);
-        leftFront.setDirection(DcMotor.Direction.FORWARD);
-        rightFront.setDirection(DcMotor.Direction.REVERSE);
+        rightBackEncoder.setDirection(DcMotor.Direction.REVERSE);
+        leftFrontEncoder.setDirection(DcMotor.Direction.FORWARD);
+        rightFrontEncoder.setDirection(DcMotor.Direction.REVERSE);
 
-        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftFrontEncoder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFrontEncoder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBackEncoder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         //setting motors to fun with encoders
-        leftFront.setPower(0);
-        rightFront.setPower(0);
-        rightBack.setPower(0);
+        leftFrontEncoder.setPower(0);
+        rightFrontEncoder.setPower(0);
+        rightBackEncoder.setPower(0);
         leftBack.setPower(0);
 
-        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftFrontEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFrontEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBackEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         Adham = new Odometer(EncoderRight, EncoderLeft, EncoderBack, robotRadius, distanceBack, omniRadius, gearing);
@@ -106,34 +106,26 @@ public class SKIRTOdometry {
     }
 
     public void testMotors(){
-        leftFront.setTargetPosition(distanceToTics(10));
-        rightFront.setTargetPosition(distanceToTics(10));
-        rightBack.setTargetPosition(distanceToTics(10));
-        leftBack.setTargetPosition(distanceToTics(10));
 
-        leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        leftFront.setPower(.2);
-        while(leftFront.isBusy()){
+        leftFrontEncoder.setPower(.2);
+        while(leftFrontEncoder.isBusy()){
             try{
                 Thread.sleep(80);
             }catch(Exception e){
                 System.out.print(e);
             }
         }
-        rightFront.setPower(.2);
-        while(rightFront.isBusy()){
+        rightFrontEncoder.setPower(.2);
+        while(rightFrontEncoder.isBusy()){
             try{
                 Thread.sleep(80);
             }catch(Exception e){
                 System.out.print(e);
             }
         }
-        rightBack.setPower(.2);
-        while(rightBack.isBusy()){
+        rightBackEncoder.setPower(.2);
+        while(rightBackEncoder.isBusy()){
             try{
                 Thread.sleep(80);
             }catch(Exception e){
@@ -149,9 +141,9 @@ public class SKIRTOdometry {
             }
         }
 
-        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftFrontEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFrontEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBackEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
@@ -169,7 +161,6 @@ public class SKIRTOdometry {
         double PowerRB;
 
         double specialPower;
-        int Specialdistanjce;
 
         boolean PerfectStrafe = false;
 
@@ -324,14 +315,10 @@ public class SKIRTOdometry {
 
 
         //calculates number of tics necessary and tells motors to go that many
-        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        leftFront.setPower(PowerLF);
-        rightFront.setPower(PowerRF);
-        rightBack.setPower(PowerRB);
+        leftFrontEncoder.setPower(PowerLF);
+        rightFrontEncoder.setPower(PowerRF);
+        rightBackEncoder.setPower(PowerRB);
         leftBack.setPower(PowerLB);
 
             if (PerfectStrafe) {
@@ -342,30 +329,12 @@ public class SKIRTOdometry {
 
                         Adham.updateOdometry();
 
-                        if (leftFront.getCurrentPosition() == rightBack.getCurrentPosition()) {
-
-                        } else if (leftFront.getCurrentPosition() < rightBack.getCurrentPosition()) {
-                            leftFront.setPower(PowerLF + correcction);
-                            PowerLF = PowerLF + correcction;
-                        } else {
-                            leftFront.setPower(PowerRB + correcction);
-                            PowerRB = PowerRB + correcction;
-                        }
                     }
                 } else {
                     while (Adham.getposition()[0] < x || Adham.getposition()[1] < y) {
 
                         Adham.updateOdometry();
 
-                        if (rightFront.getCurrentPosition() == leftBack.getCurrentPosition()) {
-
-                        } else if (rightFront.getCurrentPosition() < leftBack.getCurrentPosition()) {
-                            rightFront.setPower(PowerRF + correcction);
-                            PowerRF = PowerRF + correcction;
-                        } else {
-                            leftBack.setPower(PowerLB + correcction);
-                            PowerLB = PowerLB + correcction;
-                        }
                     }
                 }
             } else {
@@ -373,34 +342,19 @@ public class SKIRTOdometry {
 
                     Adham.updateOdometry();
 
-                    if (rightFront.getCurrentPosition() + rightBack.getCurrentPosition() == leftBack.getCurrentPosition() + leftFront.getCurrentPosition()) {
-
-                    } else if (rightFront.getCurrentPosition() + rightBack.getCurrentPosition() < leftBack.getCurrentPosition() + leftFront.getCurrentPosition()) {
-                        rightFront.setPower(PowerRF + correcction);
-                        rightBack.setPower(PowerRB + correcction);
-
-                        PowerRF = PowerRF + correcction;
-                        PowerRB = PowerRB + correcction;
-                    } else {
-                        leftBack.setPower(PowerLB + correcction);
-                        leftFront.setPower(PowerLF + correcction);
-
-                        PowerLB = PowerLB + correcction;
-                        PowerLF = PowerLF + correcction;
-                    }
                 }
 
 
             //stops everything
-            leftFront.setPower(0);
-            rightFront.setPower(0);
-            rightBack.setPower(0);
+            leftFrontEncoder.setPower(0);
+            rightFrontEncoder.setPower(0);
+            rightBackEncoder.setPower(0);
             leftBack.setPower(0);
 
             //Resets
-            leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            leftFrontEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            rightFrontEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            rightBackEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
 
