@@ -10,8 +10,7 @@ public class Testijng extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        Conttuiuys ct = new Conttuiuys();
-        ct.Main();
+        SKIRT ct = new SKIRT();
         telemetry.addData("working", true);
         telemetry.update();
         DcMotor RF = hardwareMap.dcMotor.get("rightFront");
@@ -21,16 +20,6 @@ public class Testijng extends LinearOpMode {
         ct.initalize(RF, RB, LF, LB);
         telemetry.addData("initalized: ", true);
         waitForStart();
-        Conttuiuys.x = 1;
-        Conttuiuys.y = 1;
-        Conttuiuys.POWER_FACTOR = .3;
-        Conttuiuys.running = true;
-        try{
-            Thread.sleep(2000);
-        }catch(Exception e){
-
-        }
-        Conttuiuys.running = false;
-        Conttuiuys.TOTAL_RUNNING = false;
+        ct.move(45, 45, .3);
     }
 }

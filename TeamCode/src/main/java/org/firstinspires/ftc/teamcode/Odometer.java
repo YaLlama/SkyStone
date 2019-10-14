@@ -1,38 +1,25 @@
 package org.firstinspires.ftc.teamcode;
 
-/*
-Odometry means using sensors to track the movement of a robot. In this case, we are using
-encoders on Omni's on the bottom of the robot. In the real world, Odometry like this is prone to
-inaccuracy over time so it is usually  coupled with an external positioning system such as cameras
-or distance sensors. In our case that shouldn't be needed.
-*/
-
-import android.preference.PreferenceActivity;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import java.lang.Math;
 
 public class Odometer{
 
-    //Declare all objects needed for Odometry
-    //Optical encoders
+    // Declare all objects needed for Odometry
+
+    // Optical encoders
     private DcMotor rightEnc;
     private DcMotor leftEnc;
     private DcMotor backEnc;
-    //Important variables
-    private final double robotCir;
-    private final double robotRad;
-    private final double backRad;
-    private final double encdrRad;
-    private final double ticksPerRotation = 1450; //How many ticks are in 1 revolution of the encoder
-    private double encScale;
-    private double gear; //How many times does the Omni spin for each spin of the encoder
 
+    // Outputs
     private double x;
     private double y;
     private double heading;
     private double[] position = {0, 0};
 
+    // Important variables
     private double right;
     private double left;
     private double back;
@@ -51,6 +38,7 @@ public class Odometer{
     private double backOmniAdjust;
     private double backOmniExtra;
 
+    // Movement vectors
     private double[] posChangeLR = new double[2];
     private double[] posChangeB = new double[2];
     private double[] totalPosChange = new double[2];
@@ -58,25 +46,33 @@ public class Odometer{
 
     public boolean isRunning = true;
 
-    public double rightEncDir = 1;
-    public double leftEncDir = -1;
-    public double backEncDir = -1;
+    //Important constants
+    private final double robotRad = 9.5; // Radius of the robot (Left to Right / 2)
+    private final double backRad = 31; // Distance from the center to the back Omni
+    private final double encdrRad = 1.85; // Radius of the Omni wheel
+    private final double ticksPerRotation = 1450; //How many ticks are in 1 revolution of the encoder
+    private double gear = 1.5; //How many times does the Omni spin for each spin of the encoder
+    private double encScale;
+
+    // Inverting the encoder readings
+    private double rightEncDir;
+    private double leftEncDir;
+    private double backEncDir;
 
     public void doAction(String action){
         //IDK if this feature will be used, might be a pain
     }
 
     //3 Encoder objects, The distance from the L and R Omni's to the center, The distance from the back Omni to the center, the radius of the Omni
-    public Odometer(DcMotor rightEncoder, DcMotor leftEncoder, DcMotor backEncoder, double botRadius, double backDistance, double encRadius, double gearRatio){
+    public Odometer(DcMotor rightEncoder, DcMotor leftEncoder, DcMotor backEncoder, double RD, double LD, double BD){
 
         this.rightEnc = rightEncoder;
         this.leftEnc = leftEncoder;
         this.backEnc = backEncoder;
-        this.encdrRad = encRadius;
-        this.robotRad = botRadius;
-        this.backRad = backDistance;
-        this.robotCir = 2*Math.PI*botRadius;
-        this.gear = gearRatio;
+
+        this.rightEncDir = RD;
+        this.leftEncDir = LD;
+        this.backEncDir = BD;
 
     }
 
@@ -100,6 +96,7 @@ public class Odometer{
         rightLastVal = 0;
         leftLastVal = 0;
         backLastVal = 0;
+        headingLastVal = 0;
 
         rightEnc.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftEnc.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -116,48 +113,57 @@ public class Odometer{
             back = backEnc.getCurrentPosition() * encScale * backEncDir;
 
             // Calculates direction
-            heading = (left - right)/2/robotCir*360;
+            heading = (right - left)/2/robotRad;
 
             rightChange = right - rightLastVal;
             leftChange = left - leftLastVal;
             backChange = back - backLastVal;
-            headingChange = heading - headingLastVal;
 
             //Calculating the position-change-vector from Left+Right encoders
-            if(rightChange == leftChange) { // Robot has gone straight/not moved
+
+            headingChange = heading - headingLastVal;
+
+            if(headingChange == 0) { // Robot has gone straight/not moved
+
                 posChangeLR[0] = 0;
                 posChangeLR[1] = rightChange;
-            }if(rightChange < leftChange) { //Robot has turned to the left
-                xOffestLR = Math.abs(leftChange * robotRad * 2/(rightChange - leftChange));
-            }else{ //Robot has turned to the right
-                xOffestLR = Math.abs(rightChange * robotRad * 2/(leftChange - rightChange));
-            }
 
-            if(Math.abs(rightChange) < Math.abs(leftChange)){
-                posChangeLR[0] = cos(headingChange) * (xOffestLR + robotRad) - robotRad - xOffestLR;
-                posChangeLR[1] = sin(headingChange) * (xOffestLR + robotRad);
+            }else if(Math.abs(rightChange) < Math.abs(leftChange)){ // Case 1, l is on inside
 
-            }else if(Math.abs(rightChange) > Math.abs(leftChange)){
-                posChangeLR[0] = xOffestLR + robotRad - (cos(headingChange) * (xOffestLR + robotRad));
-                posChangeLR[1] = sin(headingChange) * (xOffestLR + robotRad);
+                xOffestLR = leftChange/headingChange;
+
+                posChangeLR[0] = Math.cos(headingChange) * (xOffestLR + robotRad) - (xOffestLR + robotRad);
+                posChangeLR[1] = Math.sin(headingChange) * (xOffestLR + robotRad);
+
+            }else{ // Case 2, r is on inside
+
+                headingChange = headingLastVal - heading;
+
+                xOffestLR = rightChange/headingChange;
+
+                posChangeLR[0] = (xOffestLR + robotRad) - Math.cos(headingChange) * (xOffestLR + robotRad);
+                posChangeLR[1] = Math.sin(headingChange) * (xOffestLR + robotRad);
+
 
             }
 
             //Calculating the position-change-vector from back encoder
 
-            backOmniAdjust = backRad * 2 * Math.PI * headingChange/360;
+            headingChange = heading - headingLastVal;
+
+            backOmniAdjust = backRad * headingChange;
             backOmniExtra = backChange - backOmniAdjust;
 
-            posChangeB[0] = cos(-headingChange) * backOmniExtra;
-            posChangeB[1] = sin(-headingChange) * backOmniExtra;
+            posChangeB[0] = Math.cos(headingChange) * backOmniExtra;
+            posChangeB[1] = Math.sin(headingChange) * backOmniExtra;
 
             //Add the two vectors together
             totalPosChange[0] = posChangeLR[0] + posChangeB[0];
             totalPosChange[1] = posChangeLR[1] + posChangeB[1];
 
             //Rotate the vector;
-            rotatedMovement[0] = totalPosChange[0] * cos(-headingLastVal) - totalPosChange[1] * sin(-headingLastVal);
-            rotatedMovement[1] = totalPosChange[0] * sin(-headingLastVal) + totalPosChange[1] * cos(-headingLastVal);
+            rotatedMovement[0] = totalPosChange[0] * Math.cos(headingLastVal) - totalPosChange[1] * Math.sin(headingLastVal);
+            rotatedMovement[1] = totalPosChange[0] * Math.sin(headingLastVal) + totalPosChange[1] * Math.cos(headingLastVal);
 
             x = x + rotatedMovement[0];
             y = y + rotatedMovement[1];
@@ -169,8 +175,12 @@ public class Odometer{
         }
     }
 
-    public double getHeading() {
+    public double getHeadingRad() {
         return heading;
+    }
+
+    public double getHeadingDeg() {
+        return Math.toDegrees(heading) % 360;
     }
 
     public double[] getposition() {
@@ -181,13 +191,4 @@ public class Odometer{
         return position;
 
     }
-
-    private double cos(double theta) {
-        return Math.cos(Math.toRadians(theta));
-    }
-
-    private double sin(double theta) {
-        return Math.sin(Math.toRadians(theta));
-    }
-
 }

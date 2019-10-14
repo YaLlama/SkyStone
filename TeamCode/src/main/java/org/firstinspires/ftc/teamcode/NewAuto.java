@@ -62,9 +62,9 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
 
 public class NewAuto extends LinearOpMode {
 
-    private DcMotor RF;
-    private DcMotor RB ;
-    private DcMotor LF;
+    private DcMotor RFE;
+    private DcMotor RBE ;
+    private DcMotor LFE;
     private DcMotor LB;
 
     // IMPORTANT:  For Phone Camera, set 1) the camera source and 2) the orientation, based on how your phone is mounted:
@@ -295,13 +295,12 @@ public class NewAuto extends LinearOpMode {
         // CONSEQUENTLY do not put any driving commands in this loop.
         // To restore the normal opmode structure, just un-comment the following line:
 
-        RF = hardwareMap.dcMotor.get("rightFront");
-        RB = hardwareMap.dcMotor.get("rightBack");
-        LF = hardwareMap.dcMotor.get("leftFront");
-        LB = hardwareMap.dcMotor.get("leftBack");
+        DcMotor RFE = hardwareMap.dcMotor.get("rightFrontEncoder");
+        DcMotor LFE = hardwareMap.dcMotor.get("leftFrontEncoder");
+        DcMotor RBE = hardwareMap.dcMotor.get("rightBackEncoder");
+        DcMotor LB = hardwareMap.dcMotor.get("leftBack");
 
-        RF.setDirection(DcMotorSimple.Direction.REVERSE);
-        RB.setDirection(DcMotorSimple.Direction.REVERSE);
+        SKRTOdometry srt = new SKRTOdometry(RFE, RBE, LFE, LB);
 
         telemetry.addData("SDtatus", "waiting for start");
 
@@ -310,10 +309,11 @@ public class NewAuto extends LinearOpMode {
         // Note: To use the remote camera preview:
         // AFTER you hit Init on the Driver Station, use the "options menu" to select "Camera Stream"
         // Tap the preview window to receive a fresh image.
+        srt.move(0, 80, 0.3);
         LB.setPower(0.1);
-        LF.setPower(0.1);
-        RB.setPower(0.1);
-        RF.setPower(0.1);
+        LFE.setPower(0.1);
+        RBE.setPower(0.1);
+        RFE.setPower(0.1);
         targetsSkyStone.activate();
         while (!isStopRequested()) {
 
@@ -328,9 +328,11 @@ public class NewAuto extends LinearOpMode {
 
                         telemetry.addLine("Found Target ppp");
                         LB.setPower(0);
-                        LF.setPower(0);
-                        RB.setPower(0);
-                        RF.setPower(0);
+                        LFE.setPower(0);
+                        RBE.setPower(0);
+                        RFE.setPower(0);
+
+                        srt.move(0, -15, 0.2 );
 
                     }
                     // getUpdatedRobotLocatio  n() will return null if no new information is available since
