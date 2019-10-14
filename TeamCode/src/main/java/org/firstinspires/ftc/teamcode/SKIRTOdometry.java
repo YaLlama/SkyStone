@@ -1,6 +1,8 @@
-package org.firstinspires.ftc.teamcode.Odometry;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+
+import org.firstinspires.ftc.teamcode.Odometer;
 
 public class SKIRTOdometry {
 
@@ -100,7 +102,7 @@ public class SKIRTOdometry {
         rightBackEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        Adham = new Odometer(EncoderRight, EncoderLeft, EncoderBack, robotRadius, distanceBack, omniRadius, gearing);
+        Adham = new Odometer(rightFrontEncoder, leftFrontEncoder, rightBackEncoder, robotRadius, distanceBack, omniRadius, gearing);
         Adham.initializeOdometry();
 
     }
@@ -315,6 +317,10 @@ public class SKIRTOdometry {
 
 
         //calculates number of tics necessary and tells motors to go that many
+        leftFrontEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightFrontEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightBackEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         leftFrontEncoder.setPower(PowerLF);
         rightFrontEncoder.setPower(PowerRF);
