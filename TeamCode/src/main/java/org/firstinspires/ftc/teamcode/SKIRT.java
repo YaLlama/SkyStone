@@ -39,11 +39,29 @@ public class SKIRT {
     //circumference of wheels in centimeters
     static final double WHEEL_CIRCUMFRENCE = Math.PI * WHEEL_DIAMETER;
 
-    //Power limit
-    public static double POWER_FACTOR;
-
     //gear ratio wheel divided by motor
     static final double GEER_RATIO = 4/3;
+
+    //movement variables
+
+    double correcction;
+
+    int distanceLF = 0;
+    int distanceLB = 0;
+    int distanceRF = 0;
+    int distanceRB = 0;
+
+    double PowerLF = 0;
+    double PowerLB = 0;
+    double PowerRF = 0;
+    double PowerRB = 0;
+
+    double specialPower;
+    int Specialdistanjce;
+
+    boolean PerfectStrafe = false;
+
+    int quadrantSlope = 0;
 
 
 
@@ -142,25 +160,8 @@ public class SKIRT {
     public void move(int x, int y, double power) {
         // x and y are distances in centimeters
 
-
         //creating variables for distances each motor needs to travel and power levels and special stuff
-        double correcction = power / 6;
-        POWER_FACTOR = power;
-
-        int distanceLF;
-        int distanceLB;
-        int distanceRF;
-        int distanceRB;
-
-        double PowerLF;
-        double PowerLB;
-        double PowerRF;
-        double PowerRB;
-
-        double specialPower;
-        int Specialdistanjce;
-
-        boolean PerfectStrafe = false;
+        correcction = power / 6;
 
         //moves to desired x,y
         double slope;
@@ -243,117 +244,107 @@ public class SKIRT {
 
             Specialdistanjce = (int) (Specialdistanjce + Specialdistanjce * 3 * (1 - specialPower));
 
+
             if (swapped) {
                 int placeholder = x;
                 x = y;
                 y = placeholder;
                 swapped = false;
             }
+            switch (Case){
 
-            if (Case == 1) {
-                //motor power levels
-                PowerRF = power;
-                PowerLB = power;
-                PowerLF = -specialPower * power;
-                PowerRB = -specialPower * power;
-
-                //set motor diances
-                distanceRF = Specialdistanjce;
-                distanceLB = Specialdistanjce;
-                distanceLF = (int) (Specialdistanjce * specialPower);
-                distanceRB = (int) (Specialdistanjce * specialPower);
-
-            } else if (Case == 2) {
-                //motor power levels
-                PowerLF = power;
-                PowerRB = power;
-                PowerRF = specialPower * power;
-                PowerLB = specialPower * power;
-
-
-                //set motor diances
-                distanceLF = Specialdistanjce;
-                distanceRB = Specialdistanjce;
-                distanceRF = (int) (Specialdistanjce * specialPower);
-                distanceLB = (int) (Specialdistanjce * specialPower);
-
-
-            } else if (Case == 3) {
-                //motor power levels
-                PowerLF = power;
-                PowerRB = power;
-                PowerRF = -specialPower * power;
-                PowerLB = -specialPower * power;
-
-                //set motor diances
-                distanceLF = Specialdistanjce;
-                distanceRB = Specialdistanjce;
-                distanceRF = (int) (Specialdistanjce * specialPower);
-                distanceLB = (int) (Specialdistanjce * specialPower);
-            } else if (Case == 4) {
-                //motor power levels
-                PowerRF = -power;
-                PowerLB = -power;
-                PowerLF = -specialPower * power;
-                PowerRB = -specialPower * power;
-
-
-                //set motor diances
-                distanceRF = Specialdistanjce;
-                distanceLB = Specialdistanjce;
-                distanceLF = (int) (Specialdistanjce * specialPower);
-                distanceRB = (int) (Specialdistanjce * specialPower);
-
-            } else if (Case == 5) {
-                //motor power levels
-                PowerRF = -power;
-                PowerLB = -power;
-                PowerLF = specialPower * power;
-                PowerRB = specialPower * power;
-
-                //set motor diances
-                distanceRF = Specialdistanjce;
-                distanceLB = Specialdistanjce;
-                distanceLF = (int) (Specialdistanjce * specialPower);
-                distanceRB = (int) (Specialdistanjce * specialPower);
-
-            } else if (Case == 6) {
-                //motor power levels
-                PowerLF = -power;
-                PowerRB = -power;
-                PowerRF = -specialPower * power;
-                PowerLB = -specialPower * power;
-
-                //set motor diances
-                distanceLF = Specialdistanjce;
-                distanceRB = Specialdistanjce;
-                distanceRF = (int) (Specialdistanjce * specialPower);
-                distanceLB = (int) (Specialdistanjce * specialPower);
-
-            } else if (Case == 7) {
-                //motor power levels
-                PowerLF = -power;
-                PowerRB = -power;
-                PowerRF = specialPower * power;
-                PowerLB = specialPower * power;
-
-                //set motor diances
-                distanceLF = Specialdistanjce;
-                distanceRB = Specialdistanjce;
-                distanceRF = (int) (Specialdistanjce * specialPower);
-                distanceLB = (int) (Specialdistanjce * specialPower);
-            } else {
+                case 1:
                 //motor power levels
                 PowerRF = power;
                 PowerLB = power;
                 PowerLF = specialPower * power;
                 PowerRB = specialPower * power;
 
-                //set motor diances
-                distanceRF = Specialdistanjce;
-                distanceLB = Specialdistanjce;
-                distanceLF = (int) (Specialdistanjce * specialPower);
-                distanceRB = (int) (Specialdistanjce * specialPower);
+                quadrantSlope = -1;
+
+                break;
+
+                case 2:
+
+                //motor power levels
+                PowerLF = power;
+                PowerRB = power;
+                PowerRF = specialPower * power;
+                PowerLB = specialPower * power;
+
+                quadrantSlope = 1;
+
+                break;
+
+                case 3:
+
+                //motor power levels
+                PowerLF = power;
+                PowerRB = power;
+                PowerRF = -specialPower * power;
+                PowerLB = -specialPower * power;
+
+                quadrantSlope = 1;
+
+                break;
+
+                case 4:
+
+                //motor power levels
+                PowerRF = -power;
+                PowerLB = -power;
+                PowerLF = specialPower * power;
+                PowerRB = specialPower * power;
+
+                quadrantSlope = -1;
+
+                break;
+
+                case 5:
+
+                //motor power levels
+                PowerRF = -power;
+                PowerLB = -power;
+                PowerLF = -specialPower * power;
+                PowerRB = -specialPower * power;
+
+                quadrantSlope = -1;
+
+                break;
+
+                case 6:
+                //motor power levels
+                PowerLF = -power;
+                PowerRB = -power;
+                PowerRF = -specialPower * power;
+                PowerLB = -specialPower * power;
+
+                quadrantSlope = 1;
+
+                break;
+
+                case 7:
+
+                //motor power levels
+                PowerLF = -power;
+                PowerRB = -power;
+                PowerRF = specialPower * power;
+                PowerLB = specialPower * power;
+
+                quadrantSlope = 1;
+
+                break;
+
+                case 8:
+
+                //motor power levels
+                PowerRF = power;
+                PowerLB = power;
+                PowerLF = -specialPower * power;
+                PowerRB = -specialPower * power;
+
+                quadrantSlope = -1;
+
             }
 
         }
@@ -370,9 +361,13 @@ public class SKIRT {
         rightBack.setPower(PowerRB);
         leftBack.setPower(PowerLB);
 
+
             if (PerfectStrafe) {
 
-                if (Case == 2 || Case == 7 || Case == 3 || Case == 6) {
+                if (quadrantSlope == 1) {
+
+                    distanceRB = Specialdistanjce;
+                    distanceLF = Specialdistanjce;
 
                     while (leftFront.getCurrentPosition() < distanceToTics(distanceLF) || rightBack.getCurrentPosition() < distanceToTics(distanceRB)) {
 
@@ -387,6 +382,10 @@ public class SKIRT {
                         }
                     }
                 } else {
+
+                    distanceRF = Specialdistanjce;
+                    distanceLB = Specialdistanjce;
+
                     while (rightFront.getCurrentPosition() < distanceToTics(distanceRF) || leftBack.getCurrentPosition() < distanceToTics(distanceLB)) {
                         if (rightFront.getCurrentPosition() == leftBack.getCurrentPosition()) {
 
@@ -400,6 +399,21 @@ public class SKIRT {
                     }
                 }
             } else {
+
+                if(quadrantSlope == 1){
+                    //set motor diances
+                    distanceRB = Specialdistanjce;
+                    distanceLF = Specialdistanjce;
+                    distanceLB = (int) (Specialdistanjce * specialPower);
+                    distanceRF = (int) (Specialdistanjce * specialPower);
+                }else{
+                    //set motor diances
+                    distanceRF = Specialdistanjce;
+                    distanceLB = Specialdistanjce;
+                    distanceLF = (int) (Specialdistanjce * specialPower);
+                    distanceRB = (int) (Specialdistanjce * specialPower);
+                }
+
                 while (rightFront.getCurrentPosition() + rightBack.getCurrentPosition() < distanceToTics(distanceRF + distanceRB) || leftBack.getCurrentPosition() + leftFront.getCurrentPosition() < distanceToTics(distanceLB + distanceLF)) {
 
                     if (rightFront.getCurrentPosition() + rightBack.getCurrentPosition() == leftBack.getCurrentPosition() + leftFront.getCurrentPosition()) {
