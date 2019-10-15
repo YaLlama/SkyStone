@@ -42,7 +42,7 @@ public class SKIRT {
     //gear ratio wheel divided by motor
     static final double GEER_RATIO = 4/3;
 
-    //movement variables
+    //movement variables for move
 
     double correcction;
 
@@ -62,6 +62,11 @@ public class SKIRT {
     boolean PerfectStrafe = false;
 
     int quadrantSlope = 0;
+
+    //movement variables for moveTurning
+
+    int distanceToPoint = 0;
+
 
 
 
@@ -454,5 +459,12 @@ public class SKIRT {
 
     }
 
+    public void moveTurning( int x, int y, double power, int degrees){
+        distanceToPoint = (int) (Math.sqrt((x * x) + (y * y)));
+
+        double a = (distanceToPoint * 360 / degrees) / 2 * Math.PI;
+
+
+    }
 
 }
