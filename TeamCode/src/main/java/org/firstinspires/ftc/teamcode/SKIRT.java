@@ -215,15 +215,7 @@ public class SKIRT {
 
             }
         }
-        x = Math.abs(x);
-        y = Math.abs(y);
 
-        if (x > y) {
-            int placeholder = x;
-            x = y;
-            y = placeholder;
-            swapped = true;
-        }
 
 
         //if no horizontal movement is necessary
@@ -240,7 +232,7 @@ public class SKIRT {
 
         } else {
             // currently wronmg needs to be fixed
-            specialPower = Math.toDegrees(Math.atan(Math.abs((double) y / (double) x)));
+            specialPower = Math.toDegrees(Math.atan(Math.abs(slope)));
             //calculates how much each motor needs to move
             distanceToPoint = (int) (Math.sqrt((x * x) + (y * y)));
 
@@ -255,13 +247,6 @@ public class SKIRT {
 
             distanceToPoint = (int) (distanceToPoint + distanceToPoint * 3 * (1 - specialPower));
 
-
-            if (swapped) {
-                int placeholder = x;
-                x = y;
-                y = placeholder;
-                swapped = false;
-            }
             switch (Case){
 
                 case 1:
@@ -377,10 +362,10 @@ public class SKIRT {
 
                 if (quadrantSlope == 1) {
 
-                    distanceRB = distanceToPoint;
-                    distanceLF = distanceToPoint;
+                    distanceRB = distanceToTics(distanceToPoint);
+                    distanceLF = distanceToTics(distanceToPoint);
 
-                    while (leftFront.getCurrentPosition() < distanceToTics(distanceLF) || rightBack.getCurrentPosition() < distanceToTics(distanceRB)) {
+                    while (leftFront.getCurrentPosition() < distanceLF || rightBack.getCurrentPosition() < distanceRB) {
 
                         if (leftFront.getCurrentPosition() == rightBack.getCurrentPosition()) {
 
@@ -394,10 +379,10 @@ public class SKIRT {
                     }
                 } else {
 
-                    distanceRF = distanceToPoint;
-                    distanceLB = distanceToPoint;
+                    distanceRF = distanceToTics(distanceToPoint);
+                    distanceLB = distanceToTics(distanceToPoint);
 
-                    while (rightFront.getCurrentPosition() < distanceToTics(distanceRF) || leftBack.getCurrentPosition() < distanceToTics(distanceLB)) {
+                    while (rightFront.getCurrentPosition() < distanceRF || leftBack.getCurrentPosition() < distanceLB) {
                         if (rightFront.getCurrentPosition() == leftBack.getCurrentPosition()) {
 
                         } else if (rightFront.getCurrentPosition() < leftBack.getCurrentPosition()) {
@@ -411,21 +396,22 @@ public class SKIRT {
                 }
             } else {
 
-                if(quadrantSlope == 1){
+                if (quadrantSlope == 1) {
                     //set motor diances
-                    distanceRB = distanceToPoint;
-                    distanceLF = distanceToPoint;
-                    distanceLB = (int) (distanceToPoint * specialPower);
-                    distanceRF = (int) (distanceToPoint * specialPower);
-                }else{
+                    distanceRB = distanceToTics(distanceToPoint);
+                    distanceLF = distanceToTics(distanceToPoint);
+                    distanceLB = distanceToTics((int) (distanceToPoint * specialPower));
+                    distanceRF = distanceToTics((int) (distanceToPoint * specialPower));
+                } else {
                     //set motor diances
-                    distanceRF = distanceToPoint;
-                    distanceLB = distanceToPoint;
-                    distanceLF = (int) (distanceToPoint * specialPower);
-                    distanceRB = (int) (distanceToPoint * specialPower);
+                    distanceRF = distanceToTics(distanceToPoint);
+                    distanceLB = distanceToTics(distanceToPoint);
+                    distanceLF = distanceToTics((int) (distanceToPoint * specialPower));
+                    distanceRB = distanceToTics((int) (distanceToPoint * specialPower));
                 }
 
-                while (rightFront.getCurrentPosition() + rightBack.getCurrentPosition() < distanceToTics(distanceRF + distanceRB) || leftBack.getCurrentPosition() + leftFront.getCurrentPosition() < distanceToTics(distanceLB + distanceLF)) {
+                while (rightFront.getCurrentPosition() + rightBack.getCurrentPosition() < distanceRF + distanceRB
+                        || leftBack.getCurrentPosition() + leftFront.getCurrentPosition() < distanceLB + distanceLF) {
 
                     if (rightFront.getCurrentPosition() + rightBack.getCurrentPosition() == leftBack.getCurrentPosition() + leftFront.getCurrentPosition()) {
 
@@ -443,7 +429,7 @@ public class SKIRT {
                         PowerLF = PowerLF + correcction;
                     }
                 }
-
+            }
 
             //stops everything
             leftFront.setPower(0);
@@ -456,7 +442,7 @@ public class SKIRT {
             rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        }
+
 
         //tells us new location
         robotX += x;
@@ -476,289 +462,200 @@ public class SKIRT {
         //creating variables for distances each motor needs to travel and power levels and special stuff
         correcction = power / 6;
 
-        //moves to desired x,y
         double slope;
+
         if (x == 0) {
             slope = 0;
         } else {
             slope = (double) y / (double) x;
         }
 
-        if (-1 <= slope && slope <= 1) {
-            if (y >= 0) {
-                if (x < 0) {
-                    Case = 1;
-                } else {
-                    Case = 2;
-                }
-
-            } else {
-                if (x < 0) {
-                    Case = 6;
-                } else {
-                    Case = 5;
-                }
-
-            }
-        } else {
-            if (x > 0) {
-                if (y < 0) {
-                    Case = 4;
-                } else {
-                    Case = 3;
-                }
-
-            } else {
-                if (y < 0) {
-                    Case = 7;
-                } else {
-                    Case = 8;
-                }
-
-            }
-        }
-        x = Math.abs(x);
-        y = Math.abs(y);
-
-        if (x > y) {
-            int placeholder = x;
-            x = y;
-            y = placeholder;
-            swapped = true;
-        }
-
-
-        //if no horizontal movement is necessary
-        if (x == 0) {
-            distanceLF = y;
-            distanceLB = y;
-            distanceRF = y;
-            distanceRB = y;
-
-            PowerLB = power;
-            PowerLF = power;
-            PowerRB = power;
-            PowerRF = power;
-
-        } else {
-            // currently wronmg needs to be fixed
-            specialPower = Math.toDegrees(Math.atan(Math.abs((double) y / (double) x)));
-            //calculates how much each motor needs to move
-            distanceToPoint = (int) (Math.sqrt((x * x) + (y * y)));
-
-            if (specialPower == 45) {
-                specialPower = 0;
-                PerfectStrafe = true;
-            } else if (specialPower > 45) {
-                specialPower = specialPower / 45 - 1;
-            } else {
-                specialPower = -specialPower / 45 + 1;
-            }
-
-            distanceToPoint = (int) (distanceToPoint + distanceToPoint * 3 * (1 - specialPower));
-
-
-            if (swapped) {
-                int placeholder = x;
-                x = y;
-                y = placeholder;
-                swapped = false;
-            }
-            switch (Case){
-
-                case 1:
-                    //motor power levels
-                    PowerRF = power - (int) (strafeFactor);
-                    PowerLB = power + (int) (strafeFactor);
-                    PowerLF = specialPower * power + (int) (strafeFactor);
-                    PowerRB = specialPower * power - (int) (strafeFactor);
-
-                    quadrantSlope = -1;
-
-                    break;
-
-                case 2:
-
-                    //motor power levels
-                    PowerLF = power + (int) (strafeFactor);
-                    PowerRB = power - (int) (strafeFactor);
-                    PowerRF = specialPower * power - (int) (strafeFactor);
-                    PowerLB = specialPower * power + (int) (strafeFactor);
-
-                    quadrantSlope = 1;
-
-                    break;
-
-                case 3:
-
-                    //motor power levels
-                    PowerLF = power + (int) (strafeFactor);
-                    PowerRB = power - (int) (strafeFactor);
-                    PowerRF = -specialPower * power + (int) (strafeFactor);
-                    PowerLB = -specialPower * power - (int) (strafeFactor);
-
-                    quadrantSlope = 1;
-
-                    break;
-
-                case 4:
-
-                    //motor power levels
-                    PowerRF = -power + (int) (strafeFactor);
-                    PowerLB = -power - (int) (strafeFactor);
-                    PowerLF = specialPower * power + (int) (strafeFactor);
-                    PowerRB = specialPower * power - (int) (strafeFactor);
-
-                    quadrantSlope = -1;
-
-                    break;
-
-                case 5:
-
-                    //motor power levels
-                    PowerRF = -power + (int) (strafeFactor);
-                    PowerLB = -power - (int) (strafeFactor);
-                    PowerLF = -specialPower * power - (int) (strafeFactor);
-                    PowerRB = -specialPower * power + (int) (strafeFactor);
-
-                    quadrantSlope = -1;
-
-                    break;
-
-                case 6:
-                    //motor power levels
-                    PowerLF = -power - (int) (strafeFactor);
-                    PowerRB = -power + (int) (strafeFactor);
-                    PowerRF = -specialPower * power + (int) (strafeFactor);
-                    PowerLB = -specialPower * power - (int) (strafeFactor);
-
-                    quadrantSlope = 1;
-
-                    break;
-
-                case 7:
-
-                    //motor power levels
-                    PowerLF = -power - (int) (strafeFactor);
-                    PowerRB = -power + (int) (strafeFactor);
-                    PowerRF = specialPower * power - (int) (strafeFactor);
-                    PowerLB = specialPower * power + (int) (strafeFactor);
-
-                    quadrantSlope = 1;
-
-                    break;
-
-                case 8:
-
-                    //motor power levels
-                    PowerRF = power - (int) (strafeFactor);
-                    PowerLB = power + (int) (strafeFactor);
-                    PowerLF = -specialPower * power - (int) (strafeFactor);
-                    PowerRB = -specialPower * power + (int) (strafeFactor);
-
-                    quadrantSlope = -1;
-
-            }
-
-        }
-
-
-        //calculates number of tics necessary and tells motors to go that many
         leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        leftFront.setPower(PowerLF);
-        rightFront.setPower(PowerRF);
-        rightBack.setPower(PowerRB);
-        leftBack.setPower(PowerLB);
-
-
-        if (PerfectStrafe) {
-
-            if (quadrantSlope == 1) {
-
-                distanceRB = distanceToPoint - (int) (strafeFactor * WHEEL_CIRCUMFRENCE * TURN_FACTOR);
-                distanceLF = distanceToPoint + (int) (strafeFactor * WHEEL_CIRCUMFRENCE * TURN_FACTOR);
-
-                while (leftFront.getCurrentPosition() < distanceToTics(distanceLF) || rightBack.getCurrentPosition() < distanceToTics(distanceRB)) {
-
-                    if (leftFront.getCurrentPosition() == rightBack.getCurrentPosition()) {
-
-                    } else if (leftFront.getCurrentPosition() < rightBack.getCurrentPosition()) {
-                        leftFront.setPower(PowerLF + correcction);
-                        PowerLF = PowerLF + correcction;
+        //moves to desired x,y and now while rotating
+        do {
+            // add tan of angle gyro gives to get propper direction
+            slope = slope + 0;
+            if (-1 <= slope && slope <= 1) {
+                if (y >= 0) {
+                    if (x < 0) {
+                        Case = 1;
                     } else {
-                        leftFront.setPower(PowerRB + correcction);
-                        PowerRB = PowerRB + correcction;
+                        Case = 2;
                     }
+
+                } else {
+                    if (x < 0) {
+                        Case = 6;
+                    } else {
+                        Case = 5;
+                    }
+
                 }
             } else {
-
-                distanceRF = distanceToPoint - (int) (strafeFactor * WHEEL_CIRCUMFRENCE * TURN_FACTOR);
-                distanceLB = distanceToPoint + (int) (strafeFactor * WHEEL_CIRCUMFRENCE * TURN_FACTOR);
-
-                while (rightFront.getCurrentPosition() < distanceToTics(distanceRF) || leftBack.getCurrentPosition() < distanceToTics(distanceLB)) {
-                    if (rightFront.getCurrentPosition() == leftBack.getCurrentPosition()) {
-
-                    } else if (rightFront.getCurrentPosition() < leftBack.getCurrentPosition()) {
-                        rightFront.setPower(PowerRF + correcction);
-                        PowerRF = PowerRF + correcction;
+                if (x > 0) {
+                    if (y < 0) {
+                        Case = 4;
                     } else {
-                        leftBack.setPower(PowerLB + correcction);
-                        PowerLB = PowerLB + correcction;
+                        Case = 3;
                     }
-                }
-            }
-        } else {
 
-            if(quadrantSlope == 1){
-                //set motor diances
-                distanceRB = distanceToPoint - (int) (strafeFactor * WHEEL_CIRCUMFRENCE * TURN_FACTOR);
-                distanceLF = distanceToPoint + (int) (strafeFactor * WHEEL_CIRCUMFRENCE * TURN_FACTOR);
-                distanceLB = (int) (distanceToPoint * specialPower) + (int) (strafeFactor * WHEEL_CIRCUMFRENCE * TURN_FACTOR);
-                distanceRF = (int) (distanceToPoint * specialPower) - (int) (strafeFactor * WHEEL_CIRCUMFRENCE * TURN_FACTOR);
-            }else{
-                //set motor diances
-                distanceRF = distanceToPoint - (int) (strafeFactor * WHEEL_CIRCUMFRENCE * TURN_FACTOR);
-                distanceLB = distanceToPoint + (int) (strafeFactor * WHEEL_CIRCUMFRENCE * TURN_FACTOR);
-                distanceLF = (int) (distanceToPoint * specialPower) + (int) (strafeFactor * WHEEL_CIRCUMFRENCE * TURN_FACTOR);
-                distanceRB = (int) (distanceToPoint * specialPower) - (int) (strafeFactor * WHEEL_CIRCUMFRENCE * TURN_FACTOR);
-            }
-
-            while (rightFront.getCurrentPosition() + rightBack.getCurrentPosition() < distanceToTics(distanceRF + distanceRB) || leftBack.getCurrentPosition() + leftFront.getCurrentPosition() < distanceToTics(distanceLB + distanceLF)) {
-
-                if (rightFront.getCurrentPosition() + rightBack.getCurrentPosition() == leftBack.getCurrentPosition() + leftFront.getCurrentPosition()) {
-
-                } else if (rightFront.getCurrentPosition() + rightBack.getCurrentPosition() < leftBack.getCurrentPosition() + leftFront.getCurrentPosition()) {
-                    rightFront.setPower(PowerRF + correcction);
-                    rightBack.setPower(PowerRB + correcction);
-
-                    PowerRF = PowerRF + correcction;
-                    PowerRB = PowerRB + correcction;
                 } else {
-                    leftBack.setPower(PowerLB + correcction);
-                    leftFront.setPower(PowerLF + correcction);
+                    if (y < 0) {
+                        Case = 7;
+                    } else {
+                        Case = 8;
+                    }
 
-                    PowerLB = PowerLB + correcction;
-                    PowerLF = PowerLF + correcction;
                 }
             }
 
 
-            //stops everything
-            leftFront.setPower(0);
-            rightFront.setPower(0);
-            rightBack.setPower(0);
-            leftBack.setPower(0);
+            //if no horizontal movement is necessary
+            if (x == 0) {
+                PowerLB = power + strafeFactor;
+                PowerLF = power + strafeFactor;
+                PowerRB = power - strafeFactor;
+                PowerRF = power - strafeFactor;
 
-            //Resets
-            leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        }
+            } else {
+
+                specialPower = Math.toDegrees(Math.atan(Math.abs(slope)));
+
+                if (specialPower == 45) {
+                    specialPower = 0;
+                } else if (specialPower > 45) {
+                    specialPower = specialPower / 45 - 1;
+                } else {
+                    specialPower = -specialPower / 45 + 1;
+                }
+
+                distanceToPoint = (int) (distanceToPoint + distanceToPoint * 3 * (1 - specialPower));
+
+                switch (Case) {
+
+                    case 1:
+                        //motor power levels
+                        PowerRF = power - (int) (strafeFactor);
+                        PowerLB = power + (int) (strafeFactor);
+                        PowerLF = specialPower * power + (int) (strafeFactor);
+                        PowerRB = specialPower * power - (int) (strafeFactor);
+
+                        quadrantSlope = -1;
+
+                        break;
+
+                    case 2:
+
+                        //motor power levels
+                        PowerLF = power + (int) (strafeFactor);
+                        PowerRB = power - (int) (strafeFactor);
+                        PowerRF = specialPower * power - (int) (strafeFactor);
+                        PowerLB = specialPower * power + (int) (strafeFactor);
+
+                        quadrantSlope = 1;
+
+                        break;
+
+                    case 3:
+
+                        //motor power levels
+                        PowerLF = power + (int) (strafeFactor);
+                        PowerRB = power - (int) (strafeFactor);
+                        PowerRF = -specialPower * power + (int) (strafeFactor);
+                        PowerLB = -specialPower * power - (int) (strafeFactor);
+
+                        quadrantSlope = 1;
+
+                        break;
+
+                    case 4:
+
+                        //motor power levels
+                        PowerRF = -power + (int) (strafeFactor);
+                        PowerLB = -power - (int) (strafeFactor);
+                        PowerLF = specialPower * power + (int) (strafeFactor);
+                        PowerRB = specialPower * power - (int) (strafeFactor);
+
+                        quadrantSlope = -1;
+
+                        break;
+
+                    case 5:
+
+                        //motor power levels
+                        PowerRF = -power + (int) (strafeFactor);
+                        PowerLB = -power - (int) (strafeFactor);
+                        PowerLF = -specialPower * power - (int) (strafeFactor);
+                        PowerRB = -specialPower * power + (int) (strafeFactor);
+
+                        quadrantSlope = -1;
+
+                        break;
+
+                    case 6:
+                        //motor power levels
+                        PowerLF = -power - (int) (strafeFactor);
+                        PowerRB = -power + (int) (strafeFactor);
+                        PowerRF = -specialPower * power + (int) (strafeFactor);
+                        PowerLB = -specialPower * power - (int) (strafeFactor);
+
+                        quadrantSlope = 1;
+
+                        break;
+
+                    case 7:
+
+                        //motor power levels
+                        PowerLF = -power - (int) (strafeFactor);
+                        PowerRB = -power + (int) (strafeFactor);
+                        PowerRF = specialPower * power - (int) (strafeFactor);
+                        PowerLB = specialPower * power + (int) (strafeFactor);
+
+                        quadrantSlope = 1;
+
+                        break;
+
+                    case 8:
+
+                        //motor power levels
+                        PowerRF = power - (int) (strafeFactor);
+                        PowerLB = power + (int) (strafeFactor);
+                        PowerLF = -specialPower * power - (int) (strafeFactor);
+                        PowerRB = -specialPower * power + (int) (strafeFactor);
+
+                        quadrantSlope = -1;
+
+                }
+
+            }
+
+
+            //calculates number of tics necessary and tells motors to go that many
+            leftFront.setPower(PowerLF);
+            rightFront.setPower(PowerRF);
+            rightBack.setPower(PowerRB);
+            leftBack.setPower(PowerLB);
+
+        }while(distanceToPoint == 1) ;
+        // change to do while you still need to rotate more
+
+
+        //stops everything
+        leftFront.setPower(0);
+        rightFront.setPower(0);
+        rightBack.setPower(0);
+        leftBack.setPower(0);
+
+        //Resets
+        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
 
         //tells us new location
         robotX += x;
