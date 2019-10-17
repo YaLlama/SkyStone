@@ -10,11 +10,6 @@ public class SKRTOdometry {
     //
     //
 
-    //location ,location, location
-
-    // case for movement command
-    public int Case = 0;
-
     //declaring motors
     public static DcMotor rightFront;
     public static DcMotor leftFront;
