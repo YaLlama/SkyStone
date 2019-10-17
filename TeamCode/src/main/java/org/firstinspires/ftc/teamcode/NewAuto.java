@@ -50,7 +50,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  * see  skystone/doc/tutorial/FTC_FieldCoordinateSystemDefinition.pdf
  *
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list.
+ * RemoveTo(); or comment out the @Disabled line to add this opmode to the Driver Station OpMode list.
  *
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
@@ -309,7 +309,7 @@ public class NewAuto extends LinearOpMode {
         // Note: To use the remote camera preview:
         // AFTER you hit Init on the Driver Station, use the "options menu" to select "Camera Stream"
         // Tap the preview window to receive a fresh image.
-        srt.move(20, 50, 0.3);
+        srt.moveTo(20, 50, 0.3);
         LB.setPower(-0.1);
         LFE.setPower(-0.1);
         RBE.setPower(-0.1);
@@ -332,7 +332,7 @@ public class NewAuto extends LinearOpMode {
                         RBE.setPower(0);
                         RFE.setPower(0);
 
-                        srt.move(-10, 0, 0.2 );
+                        srt.moveTo(-10, 0, 0.2 );
 
                     }
                     // getUpdatedRobotLocatio  n() will return null if no new information is available since
