@@ -26,6 +26,12 @@ public class SKRTOdometry {
 
     double specialPower;
 
+    double strafeFactor;
+
+    //robot readious, distance from center of a wheel to center of the robot
+    static final double ROBOT_RADIOUS = 20;
+
+
 
 
     //SHORTCUTS / COMMANDS
@@ -69,7 +75,7 @@ public class SKRTOdometry {
     }
 
 
-    public void move(int x, int y, double power) {
+    public void moveTo(int x, int y, double power) {
         // x and y are distances in centimeters
         int DisX;
         int DisY;
@@ -86,11 +92,15 @@ public class SKRTOdometry {
             DisX = x - (int)odo.getposition()[0];
             DisY = y - (int)odo.getposition()[1];
 
+            odo.updateOdometry();
+
             //if no horizontal movement is necessary
             if(DisY < 0){
                 power = -power;
             }
             if (DisX == 0) {
+
+                odo.updateOdometry();
 
                 PowerLB = power;
                 PowerLF = power;
@@ -98,16 +108,28 @@ public class SKRTOdometry {
                 PowerRF = power;
             } else {
 
+                odo.updateOdometry();
+
                 slope = (double) DisY / (double) DisX + Math.tan(odo.getHeadingRad());
+
+                odo.updateOdometry();
 
                 specialPower = Math.abs(Math.toDegrees(Math.atan((slope)))) / 45 - 1;
 
+                odo.updateOdometry();
+
                 if(slope > 0){
+
+                    odo.updateOdometry();
+
                     PowerRF = power * specialPower;
                     PowerLB = power * specialPower;
                     PowerRB = power;
                     PowerLF = power;
                 }else{
+
+                    odo.updateOdometry();
+
                     PowerLF = power * specialPower;
                     PowerRB = power * specialPower;
                     PowerLB = power;
@@ -118,15 +140,21 @@ public class SKRTOdometry {
 
 
             //calculates number of tics necessary and tells motors to go that many
+            odo.updateOdometry();
 
             leftFront.setPower(PowerLF);
             rightFront.setPower(PowerRF);
             rightBack.setPower(PowerRB);
             leftBack.setPower(PowerLB);
 
+            odo.updateOdometry();
+
         }while(DisX != (int)odo.getposition()[0] && DisY != (int)odo.getposition()[1]);
 
         while(odo.getHeadingRad() != 0){
+
+            odo.updateOdometry();
+
             leftFront.setPower(power);
             rightFront.setPower(-power);
             rightBack.setPower(-power);
@@ -146,5 +174,109 @@ public class SKRTOdometry {
         leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
+    }
+    public void moveTo(int x, int y, double power, double degrees){
+
+        // x and y are distances in centimeters
+        int DisX;
+        int DisY;
+        double DegD;
+
+        //moves to desired x,y
+        double slope;
+
+        leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        do {
+            DisX = x - (int)odo.getposition()[0];
+            DisY = y - (int)odo.getposition()[1];
+
+            odo.updateOdometry();
+
+            DegD = degrees - odo.getHeadingDeg();
+
+            odo.updateOdometry();
+
+            //if no horizontal movement is necessary
+            if(DisY < 0){
+                power = -power;
+            }
+
+            odo.updateOdometry();
+
+            if (DisX == 0) {
+
+                odo.updateOdometry();
+
+                PowerLB = power + strafeFactor;
+                PowerLF = power + strafeFactor;
+                PowerRB = power - strafeFactor;
+                PowerRF = power - strafeFactor;
+
+            } else {
+
+                odo.updateOdometry();
+
+                slope = (double) DisY / (double) DisX + Math.tan(odo.getHeadingRad());
+
+                odo.updateOdometry();
+
+                specialPower = Math.abs(Math.toDegrees(Math.atan((slope)))) / 45 - 1;
+
+                odo.updateOdometry();
+
+                strafeFactor = 28424.460675 * ROBOT_RADIOUS * DegD / (28424.460675 * ROBOT_RADIOUS * DegD + 1628601.631621 * Math.sqrt(x^2 + y^2));
+
+                odo.updateOdometry();
+
+                if(slope > 0){
+
+                    odo.updateOdometry();
+
+                    PowerRF = power * specialPower - strafeFactor;
+                    PowerLB = power * specialPower + strafeFactor;
+                    PowerRB = power - strafeFactor;
+                    PowerLF = power + strafeFactor;
+                }else{
+
+                    odo.updateOdometry();
+
+                    PowerLF = power * specialPower + strafeFactor;
+                    PowerRB = power * specialPower - strafeFactor;
+                    PowerLB = power + strafeFactor;
+                    PowerRF = power - strafeFactor;
+                }
+
+            }
+
+            odo.updateOdometry();
+            //calculates number of tics necessary and tells motors to go that many
+
+            leftFront.setPower(PowerLF);
+            rightFront.setPower(PowerRF);
+            rightBack.setPower(PowerRB);
+            leftBack.setPower(PowerLB);
+
+            odo.updateOdometry();
+
+        }while(DisX != (int)odo.getposition()[0] && DisY != (int)odo.getposition()[1]);
+
+        //stops everything
+        leftFront.setPower(0);
+        rightFront.setPower(0);
+        rightBack.setPower(0);
+        leftBack.setPower(0);
+
+        //Resets
+        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+
+    }
     }
 }

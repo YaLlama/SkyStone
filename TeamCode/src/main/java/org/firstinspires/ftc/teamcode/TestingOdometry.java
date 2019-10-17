@@ -15,6 +15,6 @@ public class TestingOdometry extends LinearOpMode {
         DcMotor LB = hardwareMap.dcMotor.get("leftBack");
         SKRTOdometry srt = new SKRTOdometry(RFE, RBE, LFE, LB);
         waitForStart();
-        srt.move(45, 45, .3);
+        srt.moveTo(45, 45, .3);
     }
 }
