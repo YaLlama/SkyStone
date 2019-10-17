@@ -102,9 +102,6 @@ public class SKRTOdometry {
 
                 specialPower = Math.abs(Math.toDegrees(Math.atan((slope)))) / 45 - 1;
 
-                if(DisY < 0){
-                    specialPower = -specialPower;
-                }
                 if(slope > 0){
                     PowerRF = power * specialPower;
                     PowerLB = power * specialPower;
