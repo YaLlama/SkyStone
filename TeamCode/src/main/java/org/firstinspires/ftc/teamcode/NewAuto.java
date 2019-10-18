@@ -309,7 +309,7 @@ public class NewAuto extends LinearOpMode {
         // Note: To use the remote camera preview:
         // AFTER you hit Init on the Driver Station, use the "options menu" to select "Camera Stream"
         // Tap the preview window to receive a fresh image.
-        srt.moveTo(20, 50, 0.3);
+        srt.moveTo(20, 50, 0.3, 1);
         LB.setPower(-0.1);
         LFE.setPower(-0.1);
         RBE.setPower(-0.1);
@@ -332,7 +332,7 @@ public class NewAuto extends LinearOpMode {
                         RBE.setPower(0);
                         RFE.setPower(0);
 
-                        srt.moveTo(-10, 0, 0.2 );
+                        srt.moveTo(-10, 0, 0.2, 1 );
 
                     }
                     // getUpdatedRobotLocatio  n() will return null if no new information is available since

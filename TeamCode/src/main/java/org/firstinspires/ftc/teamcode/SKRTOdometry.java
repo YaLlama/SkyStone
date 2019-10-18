@@ -147,12 +147,13 @@ public class SKRTOdometry {
 
 
     }
-    public void moveTo(int x, int y, double power, double degrees){
+    public void moveTo(int x, int y, double power, int  threshholdPerAxiz, double degrees){
 
         // x and y are distances in centimeters
         int DisX;
         int DisY;
         double DegD;
+        double DisP;
 
         //moves to desired x,y
         double slope;
@@ -168,36 +169,40 @@ public class SKRTOdometry {
 
             DegD = degrees - odo.getHeadingDeg();
 
+
             odo.updateOdometry();
 
             //if no horizontal movement is necessary
+            slope = Math.tan(Math.atan((double) DisY / (double) DisX) + DegD);
+
+            specialPower = Math.abs(Math.toDegrees(Math.atan(slope))) / 45 - 1;
+
+            strafeFactor = 28424.460675 * ROBOT_RADIOUS * DegD / (28424.460675 * ROBOT_RADIOUS * DegD + 1628601.631621 * Math.sqrt(x^2 + y^2));
+
             if(DisY < 0){
-                power = -power;
+                DisP = -power;
+            }else{
+                DisP = power;
             }
 
             if (DisX == 0) {
-                PowerLB = power + strafeFactor;
-                PowerLF = power + strafeFactor;
-                PowerRB = power - strafeFactor;
-                PowerRF = power - strafeFactor;
+                PowerLB = DisP + strafeFactor;
+                PowerLF = DisP + strafeFactor;
+                PowerRB = DisP - strafeFactor;
+                PowerRF = DisP - strafeFactor;
 
             } else {
-                slope = (double) DisY / (double) DisX + Math.tan(odo.getHeadingRad());
-
-                specialPower = Math.abs(Math.toDegrees(Math.atan((slope)))) / 45 - 1;
-
-                strafeFactor = 28424.460675 * ROBOT_RADIOUS * DegD / (28424.460675 * ROBOT_RADIOUS * DegD + 1628601.631621 * Math.sqrt(x^2 + y^2));
 
                 if(slope > 0){
-                    PowerRF = power * specialPower - strafeFactor;
-                    PowerLB = power * specialPower + strafeFactor;
-                    PowerRB = power - strafeFactor;
-                    PowerLF = power + strafeFactor;
+                    PowerRF = DisP * specialPower - strafeFactor;
+                    PowerLB = DisP * specialPower + strafeFactor;
+                    PowerRB = DisP - strafeFactor;
+                    PowerLF = DisP + strafeFactor;
                 }else{
-                    PowerLF = power * specialPower + strafeFactor;
-                    PowerRB = power * specialPower - strafeFactor;
-                    PowerLB = power + strafeFactor;
-                    PowerRF = power - strafeFactor;
+                    PowerLF = DisP * specialPower + strafeFactor;
+                    PowerRB = DisP * specialPower - strafeFactor;
+                    PowerLB = DisP + strafeFactor;
+                    PowerRF = DisP - strafeFactor;
                 }
 
             }
@@ -209,7 +214,7 @@ public class SKRTOdometry {
             rightBack.setPower(PowerRB);
             leftBack.setPower(PowerLB);
 
-        }while(DisX != (int)odo.getposition()[0] && DisY != (int)odo.getposition()[1]);
+        }while(Math.abs(DisX) > threshholdPerAxiz || Math.abs(DisY) > threshholdPerAxiz);
 
         //stops everything
         leftFront.setPower(0);
