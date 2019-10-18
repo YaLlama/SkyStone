@@ -39,8 +39,6 @@ public class SKRTOdometry {
     //
     //
     //
-
-
     public SKRTOdometry(DcMotor RFE, DcMotor RBE, DcMotor LFE, DcMotor LB) {
         //declaring motors
         rightFront = RFE;
@@ -69,11 +67,22 @@ public class SKRTOdometry {
 
     }
 
+    public int posX(){
+        return (int) odo.getposition()[0];
+    }
 
-    public void moveTo(int x, int y, double power) {
+
+    public int posY(){
+        return (int) odo.getposition()[1];
+    }
+
+
+    public void moveTo(int x, int y, double power, int threshholdPerAxiz) {
         // x and y are distances in centimeters
         int DisX;
         int DisY;
+
+        double disP;
 
         //moves to desired x,y
         double slope;
@@ -91,28 +100,30 @@ public class SKRTOdometry {
 
             //if no horizontal movement is necessary
             if(DisY < 0){
-                power = -power;
+                disP = -power;
+            }else{
+                disP = power;
             }
             if (DisX == 0) {
-                PowerLB = power;
-                PowerLF = power;
-                PowerRB = power;
-                PowerRF = power;
+                PowerLB = disP;
+                PowerLF = disP;
+                PowerRB = disP;
+                PowerRF = disP;
             } else {
-                slope = (double) DisY / (double) DisX + Math.tan(odo.getHeadingRad());
+                slope = (double) DisY / (double) DisX;
 
-                specialPower = Math.abs(Math.toDegrees(Math.atan((slope)))) / 45 - 1;
+                specialPower = Math.abs(Math.toDegrees(Math.atan(slope))) / 45 - 1;
 
                 if(slope > 0){
-                    PowerRF = power * specialPower;
-                    PowerLB = power * specialPower;
-                    PowerRB = power;
-                    PowerLF = power;
+                    PowerRF = disP * specialPower;
+                    PowerLB = disP * specialPower;
+                    PowerRB = disP;
+                    PowerLF = disP;
                 }else{
-                    PowerLF = power * specialPower;
-                    PowerRB = power * specialPower;
-                    PowerLB = power;
-                    PowerRF = power;
+                    PowerLF = disP * specialPower;
+                    PowerRB = disP * specialPower;
+                    PowerLB = disP;
+                    PowerRF = disP;
                 }
 
             }
@@ -124,17 +135,8 @@ public class SKRTOdometry {
             rightBack.setPower(PowerRB);
             leftBack.setPower(PowerLB);
 
-        }while(DisX != (int)odo.getposition()[0] && DisY != (int)odo.getposition()[1]);
+        }while(Math.abs(DisX) > threshholdPerAxiz || Math.abs(DisY) > threshholdPerAxiz);
 
-        while(odo.getHeadingRad() != 0){
-
-            odo.updateOdometry();
-
-            leftFront.setPower(power);
-            rightFront.setPower(-power);
-            rightBack.setPower(-power);
-            leftBack.setPower(power);
-        }
 
         //stops everything
         leftFront.setPower(0);
