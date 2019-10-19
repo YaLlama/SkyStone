@@ -331,8 +331,8 @@ public class NewAuto extends LinearOpMode {
                         LFE.setPower(0);
                         RBE.setPower(0);
                         RFE.setPower(0);
-                        srt.moveTo(srt.posX(), (-srt.posY()) - 15, 0.3, 1);
-                        srt.moveTo(srt.posX()+20, srt.posY(), 0.3, 1);
+                        srt.move(0, 15, .3, 1);
+                        srt.move(20, 0, .3, 1);
 
 
                     }

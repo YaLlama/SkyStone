@@ -70,10 +70,86 @@ public class SKRTOdometry {
     public int posX(){
         return (int) odo.getposition()[0];
     }
-
-
     public int posY(){
         return (int) odo.getposition()[1];
+    }
+
+    public void move(int x, int y, double power, int threshholdPerAxiz) {
+        // x and y are distances in centimeters
+        int DisX;
+        int DisY;
+
+        int SrtX = (int) odo.getposition()[0];
+        int SrtY = (int) odo.getposition()[1];
+
+        int CurX;
+        int CurY;
+
+        double disP;
+
+        //moves to desired x,y
+        double slope;
+
+        leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        do {
+            CurX = (int) odo.getposition()[0] - SrtX;
+            CurY = (int) odo.getposition()[1] - SrtY;
+
+            DisX = x - CurX;
+            DisY = y - CurY;
+
+            odo.updateOdometry();
+
+            //if no horizontal movement is necessary
+            if(DisY < 0){
+                disP = -power;
+            }else{
+                disP = power;
+            }
+            if (DisX == 0) {
+                PowerLB = disP;
+                PowerLF = disP;
+                PowerRB = disP;
+                PowerRF = disP;
+            } else {
+                slope = (double) DisY / (double) DisX;
+
+                specialPower = Math.abs(Math.toDegrees(Math.atan(slope))) / 45 - 1;
+
+                if(slope > 0){
+                    PowerRF = disP * specialPower;
+                    PowerLB = disP * specialPower;
+                    PowerRB = disP;
+                    PowerLF = disP;
+                }else{
+                    PowerLF = disP * specialPower;
+                    PowerRB = disP * specialPower;
+                    PowerLB = disP;
+                    PowerRF = disP;
+                }
+
+            }
+
+
+            //calculates number of tics necessary and tells motors to go that many
+            leftFront.setPower(PowerLF);
+            rightFront.setPower(PowerRF);
+            rightBack.setPower(PowerRB);
+            leftBack.setPower(PowerLB);
+
+        }while(Math.abs(DisX) > threshholdPerAxiz && Math.abs(DisY) > threshholdPerAxiz);
+
+
+        //stops everything
+        leftFront.setPower(0);
+        rightFront.setPower(0);
+        rightBack.setPower(0);
+        leftBack.setPower(0);
+
     }
 
     public void moveTo(int x, int y, double power, int threshholdPerAxiz) {
@@ -134,7 +210,7 @@ public class SKRTOdometry {
             rightBack.setPower(PowerRB);
             leftBack.setPower(PowerLB);
 
-        }while(Math.abs(DisX) > threshholdPerAxiz || Math.abs(DisY) > threshholdPerAxiz);
+        }while(Math.abs(DisX) > threshholdPerAxiz && Math.abs(DisY) > threshholdPerAxiz);
 
 
         //stops everything
