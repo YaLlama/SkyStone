@@ -225,7 +225,7 @@ public class SKRTOdometry {
             rightBack.setPower(PowerRB);
             leftBack.setPower(PowerLB);
 
-        }while(Math.abs(DisX) > threshholdPerAxiz && Math.abs(DisY) > threshholdPerAxiz && DegD > andgleThreshhold);
+        }while(Math.abs(DisX) > threshholdPerAxiz && Math.abs(DisY) > threshholdPerAxiz && Math.abs(DegD) > andgleThreshhold);
 
 
         //stops everything
