@@ -18,7 +18,7 @@ public class TestingOdometry extends LinearOpMode {
         telemetry.addData("y", srt.posY());
         telemetry.update();
         waitForStart();
-        srt.moveTo(45, 45, .3, 1, 90);
+        srt.moveTo(45, 45, .3, 1);
 
     }
 }
