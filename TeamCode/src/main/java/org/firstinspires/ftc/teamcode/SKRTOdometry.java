@@ -76,7 +76,6 @@ public class SKRTOdometry {
         return (int) odo.getposition()[1];
     }
 
-
     public void moveTo(int x, int y, double power, int threshholdPerAxiz) {
         // x and y are distances in centimeters
         int DisX;
@@ -144,10 +143,101 @@ public class SKRTOdometry {
         rightBack.setPower(0);
         leftBack.setPower(0);
 
+    }
+    public void moveTo(int x, int y, double power, int threshholdPerAxiz, int degrees, int andgleThreshhold) {
+        // x and y are distances in centimeters
+        int DisX;
+        int DisY;
+
+        int DegD;
+
+        double correction = power/6;
+
+        double correct;
+
+        double disP;
+
+        //moves to desired x,y
+        double slope;
+
+        leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        do {
+            DisX = x - (int)odo.getposition()[0];
+            DisY = y - (int)odo.getposition()[1];
+
+            DegD = degrees - (int) odo.getHeadingDeg();
+
+            odo.updateOdometry();
+
+            if(DegD == 0){
+                correct = 0;
+            }else if(DegD > 0){
+                correct = correction;
+            }else{
+                correct = -correction;
+            }
+
+            //if no horizontal movement is necessary
+            if(DisY < 0){
+                disP = -power;
+            }else{
+                disP = power;
+            }
+            if (DisX == 0) {
+                if(DisY == 0){
+                    PowerLB = correct;
+                    PowerLF = correct;
+                    PowerRB = -correct;
+                    PowerRF = -correct;
+                }else {
+                    PowerLB = disP + correct;
+                    PowerLF = disP + correct;
+                    PowerRB = disP - correct;
+                    PowerRF = disP - correct;
+                }
+            } else {
+                slope = Math.tan(Math.atan((double) DisY / (double) DisX) - Math.toRadians(DegD));
+
+                specialPower = Math.abs(Math.toDegrees(Math.atan(slope))) / 45 - 1;
+
+                if(slope > 0){
+                    PowerRF = disP * specialPower - correct;
+                    PowerLB = disP * specialPower + correct;
+                    PowerRB = disP - correct;
+                    PowerLF = disP + correct;
+                }else{
+                    PowerLF = disP * specialPower + correct;
+                    PowerRB = disP * specialPower - correct;
+                    PowerLB = disP + correct;
+                    PowerRF = disP - correct;
+                }
+
+            }
+
+
+            //calculates number of tics necessary and tells motors to go that many
+            leftFront.setPower(PowerLF);
+            rightFront.setPower(PowerRF);
+            rightBack.setPower(PowerRB);
+            leftBack.setPower(PowerLB);
+
+        }while(Math.abs(DisX) > threshholdPerAxiz && Math.abs(DisY) > threshholdPerAxiz && DegD > andgleThreshhold);
+
+
+        //stops everything
+        leftFront.setPower(0);
+        rightFront.setPower(0);
+        rightBack.setPower(0);
+        leftBack.setPower(0);
+
 
 
     }
-    public void moveTo(int x, int y, double power, int  threshholdPerAxiz, double degrees){
+    public void moveTo(int x, int y, double power, int  threshholdPerAxiz, double degrees, int DO_NOT_USE_THIS_ONE_STILL_IN_BETA){
 
         // x and y are distances in centimeters
         int DisX;
