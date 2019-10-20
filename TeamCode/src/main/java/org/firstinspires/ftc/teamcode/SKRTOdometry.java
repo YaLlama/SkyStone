@@ -39,12 +39,12 @@ public class SKRTOdometry {
     //
     //
     //
-    public SKRTOdometry(DcMotor RFE, DcMotor RBE, DcMotor LFE, DcMotor LB) {
+    public SKRTOdometry(DcMotor RFE, DcMotor LFE, DcMotor LBE, DcMotor RB) {
         //declaring motors
         rightFront = RFE;
         leftFront = LFE;
-        rightBack = RBE;
-        leftBack = LB;
+        rightBack = RB;
+        leftBack = LBE;
 
         leftBack.setDirection(DcMotor.Direction.FORWARD);
         rightBack.setDirection(DcMotor.Direction.REVERSE);
@@ -62,7 +62,7 @@ public class SKRTOdometry {
         rightBack.setPower(0);
         leftBack.setPower(0);
 
-        odo = new Odometer(rightFront, leftFront, rightBack, -1, -1, 1);
+        odo = new Odometer(rightFront, leftFront, leftBack, -1, -1, -1);
         odo.initializeOdometry();
 
     }

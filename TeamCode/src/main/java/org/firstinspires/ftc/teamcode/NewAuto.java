@@ -295,12 +295,12 @@ public class NewAuto extends LinearOpMode {
         // CONSEQUENTLY do not put any driving commands in this loop.
         // To restore the normal opmode structure, just un-comment the following line:
 
-        DcMotor RFE = hardwareMap.dcMotor.get("rightFrontEncoder");
-        DcMotor LFE = hardwareMap.dcMotor.get("leftFrontEncoder");
-        DcMotor RBE = hardwareMap.dcMotor.get("rightBackEncoder");
-        DcMotor LB = hardwareMap.dcMotor.get("leftBack");
+        DcMotor RFE = hardwareMap.dcMotor.get("rightEncoder");
+        DcMotor LFE = hardwareMap.dcMotor.get("leftEncoder");
+        DcMotor LBE = hardwareMap.dcMotor.get("backEncoder");
+        DcMotor RB = hardwareMap.dcMotor.get("rightBack");
 
-        SKRTOdometry srt = new SKRTOdometry(RFE, RBE, LFE, LB);
+        SKRTOdometry srt = new SKRTOdometry(RFE, LFE, LBE, RB);
 
         telemetry.addData("SDtatus", "waiting for start");
 
