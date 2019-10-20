@@ -66,7 +66,6 @@ public class NewAuto extends LinearOpMode {
     private DcMotor RBE ;
     private DcMotor LFE;
     private DcMotor LB;
-
     // IMPORTANT:  For Phone Camera, set 1) the camera source and 2) the orientation, based on how your phone is mounted:
     // 1) Camera Source.  Valid choices are:  BACK (behind screen) or FRONT (selfie side)
     // 2) Phone Orientation. Choices are: PHONE_IS_PORTRAIT = true (portrait) or PHONE_IS_PORTRAIT = false (landscape)
@@ -118,7 +117,7 @@ public class NewAuto extends LinearOpMode {
     private float phoneYRotate    = 0;
     private float phoneZRotate    = 0;
 
-    @Override public void runOpMode() {
+    @Override public void runOpMode() throws InterruptedException {
 
 
 
@@ -309,11 +308,12 @@ public class NewAuto extends LinearOpMode {
         // Note: To use the remote camera preview:
         // AFTER you hit Init on the Driver Station, use the "options menu" to select "Camera Stream"
         // Tap the preview window to receive a fresh image.
-        srt.moveTo(20, 50, 0.3, 1);
-        LB.setPower(-0.1);
-        LFE.setPower(-0.1);
-        RBE.setPower(-0.1);
-        RFE.setPower(-0.1);
+        srt.moveTo(35, 30, 0.4,1);
+        LB.setPower(-0.13);
+        LFE.setPower(-0.13);
+        RBE.setPower(-0.13);
+        RFE.setPower(-0.13);
+
         targetsSkyStone.activate();
         while (!isStopRequested()) {
 
@@ -326,13 +326,14 @@ public class NewAuto extends LinearOpMode {
 
                     if (trackable.getName().equals("Stone Target")){
 
-                        telemetry.addLine("Found Target ppp");
+                        telemetry.addLine("Found Target  ");
                         LB.setPower(0);
                         LFE.setPower(0);
                         RBE.setPower(0);
                         RFE.setPower(0);
+                        srt.move(0, 15, .3, 1);
+                        srt.move(20, 0, .3, 1);
 
-                        srt.moveTo(-10, 0, 0.2, 1 );
 
                     }
                     // getUpdatedRobotLocatio  n() will return null if no new information is available since
