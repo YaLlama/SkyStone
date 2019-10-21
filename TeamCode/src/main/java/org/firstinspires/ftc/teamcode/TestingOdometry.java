@@ -20,8 +20,7 @@ public class TestingOdometry extends LinearOpMode {
         waitForStart();
 
         srt.moveTo(45, 45, .3, 0, 90, 0);
-
-        srt.moveTo(45, 45, .3, 1);
+        srt.move(-45, -45, .3, 0);
 
 
     }

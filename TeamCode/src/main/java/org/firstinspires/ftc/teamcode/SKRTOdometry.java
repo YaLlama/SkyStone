@@ -241,6 +241,8 @@ public class SKRTOdometry {
         rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        correct = 0;
+
         do {
             DisX = x - (int)odo.getposition()[0];
             DisY = y - (int)odo.getposition()[1];
@@ -276,7 +278,7 @@ public class SKRTOdometry {
                     PowerRF = disP - correct;
                 }
             } else {
-                slope = Math.tan(Math.atan((double) DisY / (double) DisX) - Math.toRadians(DegD));
+                slope = Math.tan(Math.atan((double) DisY / (double) DisX) - Math.toRadians((double)DegD));
 
                 specialPower = Math.abs(Math.toDegrees(Math.atan(slope))) / 45 - 1;
 
