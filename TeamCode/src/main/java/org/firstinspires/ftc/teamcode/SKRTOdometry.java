@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 public class SKRTOdometry {
@@ -39,7 +40,7 @@ public class SKRTOdometry {
     //
     //
     //
-    public SKRTOdometry(DcMotor RFE, DcMotor LFE, DcMotor LBE, DcMotor RB) {
+    public SKRTOdometry(DcMotor RFE, DcMotor LFE, DcMotor LBE, DcMotor RB, LinearOpMode oppy) {
         //declaring motors
         rightFront = RFE;
         leftFront = LFE;
@@ -62,25 +63,29 @@ public class SKRTOdometry {
         rightBack.setPower(0);
         leftBack.setPower(0);
 
-        odo = new Odometer(rightFront, leftFront, leftBack, -1, -1, -1);
+        odo = new Odometer(rightFront, leftFront, leftBack, -1, -1, 1, oppy);
         odo.initializeOdometry();
 
     }
 
     public int posX(){
-        return (int) odo.getposition()[0];
+        return (int) odo.getPosition()[0];
     }
     public int posY(){
-        return (int) odo.getposition()[1];
+        return (int) odo.getPosition()[1];
     }
+    public int angD(){
+        return (int) odo.getHeadingDeg();
+    }
+
 
     public void move(int x, int y, double power, int threshholdPerAxiz) {
         // x and y are distances in centimeters
         int DisX;
         int DisY;
 
-        int SrtX = (int) odo.getposition()[0];
-        int SrtY = (int) odo.getposition()[1];
+        int SrtX = (int) odo.getPosition()[0];
+        int SrtY = (int) odo.getPosition()[1];
 
         int CurX;
         int CurY;
@@ -96,8 +101,8 @@ public class SKRTOdometry {
         leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         do {
-            CurX = (int) odo.getposition()[0] - SrtX;
-            CurY = (int) odo.getposition()[1] - SrtY;
+            CurX = (int) odo.getPosition()[0] - SrtX;
+            CurY = (int) odo.getPosition()[1] - SrtY;
 
             DisX = x - CurX;
             DisY = y - CurY;
@@ -168,8 +173,8 @@ public class SKRTOdometry {
         leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         do {
-            DisX = x - (int)odo.getposition()[0];
-            DisY = y - (int)odo.getposition()[1];
+            DisX = x - (int)odo.getPosition()[0];
+            DisY = y - (int)odo.getPosition()[1];
 
             odo.updateOdometry();
 
@@ -210,7 +215,7 @@ public class SKRTOdometry {
             rightBack.setPower(PowerRB);
             leftBack.setPower(PowerLB);
 
-        }while(Math.abs(DisX) > threshholdPerAxiz && Math.abs(DisY) > threshholdPerAxiz);
+        }while(Math.abs(DisX) > threshholdPerAxiz || Math.abs(DisY) > threshholdPerAxiz);
 
 
         //stops everything
@@ -241,17 +246,17 @@ public class SKRTOdometry {
         rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        correct = 0;
+
 
         do {
-            DisX = x - (int)odo.getposition()[0];
-            DisY = y - (int)odo.getposition()[1];
+            DisX = x - (int)odo.getPosition()[0];
+            DisY = y - (int)odo.getPosition()[1];
 
-            DegD = degrees - (int) odo.getHeadingDeg();
+            DegD = degrees + (int) odo.getHeadingDeg();
 
             odo.updateOdometry();
 
-            if(DegD == 0){
+            if(Math.abs(DegD) < andgleThreshhold){
                 correct = 0;
             }else if(DegD > 0){
                 correct = correction;
@@ -303,7 +308,7 @@ public class SKRTOdometry {
             rightBack.setPower(PowerRB);
             leftBack.setPower(PowerLB);
 
-        }while(Math.abs(DisX) > threshholdPerAxiz && Math.abs(DisY) > threshholdPerAxiz && Math.abs(DegD) > andgleThreshhold);
+        }while(Math.abs(DisX) > threshholdPerAxiz || Math.abs(DisY) > threshholdPerAxiz || Math.abs(DegD) > andgleThreshhold);
 
 
         //stops everything
@@ -332,8 +337,8 @@ public class SKRTOdometry {
         leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         do {
-            DisX = x - (int)odo.getposition()[0];
-            DisY = y - (int)odo.getposition()[1];
+            DisX = x - (int)odo.getPosition()[0];
+            DisY = y - (int)odo.getPosition()[1];
 
             DegD = degrees - odo.getHeadingDeg();
 

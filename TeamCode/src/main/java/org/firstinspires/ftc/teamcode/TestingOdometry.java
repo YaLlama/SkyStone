@@ -13,15 +13,13 @@ public class TestingOdometry extends LinearOpMode {
         DcMotor LFE = hardwareMap.dcMotor.get("leftEncoder");
         DcMotor LBE = hardwareMap.dcMotor.get("backEncoder");
         DcMotor RB = hardwareMap.dcMotor.get("rightBack");
-        SKRTOdometry srt = new SKRTOdometry(RFE, LFE, LBE, RB);
+        SKRTOdometry srt = new SKRTOdometry(RFE, LFE, LBE, RB, this);
         telemetry.addData("x", srt.posX());
         telemetry.addData("y", srt.posY());
+        telemetry.addData("angle", srt.angD());
         telemetry.update();
         waitForStart();
 
-        srt.moveTo(45, 45, .3, 0, 90, 0);
-        srt.move(-45, -45, .3, 0);
-
-
+        srt.moveTo(60, 60, .3, 0, 90, 0);
     }
 }

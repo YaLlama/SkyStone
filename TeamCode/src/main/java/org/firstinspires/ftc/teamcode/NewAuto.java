@@ -299,7 +299,7 @@ public class NewAuto extends LinearOpMode {
         DcMotor LBE = hardwareMap.dcMotor.get("backEncoder");
         DcMotor RB = hardwareMap.dcMotor.get("rightBack");
 
-        SKRTOdometry srt = new SKRTOdometry(RFE, LFE, LBE, RB);
+        SKRTOdometry srt = new SKRTOdometry(RFE, LFE, LBE, RB, this);
 
         telemetry.addData("SDtatus", "waiting for start");
 
