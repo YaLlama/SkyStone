@@ -35,6 +35,8 @@ public class Extrusion {
     private static Gamepad g1;
     private static Servo cs;
     private static Servo rs;
+    private static DcMotor ir;
+    private static DcMotor il;
 
     private boolean extrusionAutonymus = false;
     private boolean placingAutonymus = false;
@@ -64,8 +66,13 @@ public class Extrusion {
     double x1;
     double x2;
 
+    double rx;
+    double ry;
 
-    public Extrusion(DcMotor extrusion, Gamepad gamepad1, Gamepad gamePad2, DcMotor lf, DcMotor lb, DcMotor rb, DcMotor rf, Servo clampServo, Servo rotateServo){
+
+    public Extrusion(DcMotor extrusion, Gamepad gamepad1, Gamepad gamePad2, DcMotor lf, DcMotor lb, DcMotor rb, DcMotor rf, Servo clampServo, Servo rotateServo, DcMotor intakeLeft, DcMotor intakeRight){
+        //Motors not reversed in any way except for intake
+
         ex = extrusion;
         g2 = gamePad2;
         g1 = gamepad1;
@@ -73,8 +80,13 @@ public class Extrusion {
         cs = clampServo;
         rs = rotateServo;
 
+        ir = intakeRight;
+        il = intakeLeft;
+
+        ir.setDirection(DcMotorSimple.Direction.REVERSE);
+        il.setDirection(DcMotorSimple.Direction.FORWARD);
+
         ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        ex.setDirection(DcMotorSimple.Direction.FORWARD);
 
         rightBack = rb;
         rightFront = rf;
@@ -86,10 +98,16 @@ public class Extrusion {
         leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        il.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        ir.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+        il.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        ir.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
 
     }
@@ -119,14 +137,15 @@ public class Extrusion {
     public void extrusionManual(){
         //Control for moving extrusion up
 
-        if(g2.dpad_up && ex.getCurrentPosition() < MAX_HEIGHT){
+        if(g2.left_stick_y > DEAD_ZONE && ex.getCurrentPosition() < MAX_HEIGHT && ex.getCurrentPosition() > FIRST_LEVEL_HEIGHT){
+            if(-g2.left_stick_y > 0){
+
+            }
             ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             extrusionAutonymus = false;
-            ex.setPower(EXTRUSION_POWER);
-        }else if(g2.dpad_down && ex.getCurrentPosition() > 0) {
-            ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            extrusionAutonymus = false;
-            ex.setPower(-EXTRUSION_POWER);
+            ex.setPower(-g2.left_stick_y);
+        }else if(!extrusionAutonymus){
+            ex.setPower(0);
         }
     }
 
@@ -179,7 +198,21 @@ public class Extrusion {
         }
     }
 
-    public void reset(){
+    public void intakeManual(){
+        //intake controls
+        if(Math.abs(g2.right_stick_x) > DEAD_ZONE || Math.abs(g2.right_stick_y) > DEAD_ZONE){
+            rx = g2.right_stick_x;
+            ry = -g2.right_stick_y;
+            il.setPower(ry + rx);
+            ir.setPower(ry - rx);
+        }else{
+            il.setPower(0);
+            ir.setPower(0);
+        }
+    }
+
+    public void resetExtrusion(){
+        //comntrol for resetting evertything
         if(g1.a) {
             ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             ex.setTargetPosition(0);
