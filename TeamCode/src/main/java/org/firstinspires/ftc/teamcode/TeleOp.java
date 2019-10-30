@@ -61,8 +61,8 @@ public class TeleOp {
     //encoder value with first block placed perfectly on build plate
     public static final int FIRST_LEVEL_HEIGHT = 0;
 
-    //amount of encoder value needed to be added to clear block trying to stack on
-    public static final int CLEARENCE = 0;
+    //the amount of encoder tics between levels
+    public static final int LEVEL_HEIGHT = 0;
 
     //the encoder amount it needs to be lowered in order to lock block into place
     public static final int LOCKED_POSITION = 0;
@@ -81,6 +81,8 @@ public class TeleOp {
 
     double rx;
     double ry;
+
+    static int level = 0;
 
 
     public TeleOp(DcMotor extrusion, Gamepad gamepad1, Gamepad gamePad2, DcMotor lf, DcMotor lb, DcMotor rb, DcMotor rf, Servo clampServo, Servo rotateServo, DcMotor intakeLeft, DcMotor intakeRight, Servo buildLeft, Servo buildRight){
@@ -174,7 +176,7 @@ public class TeleOp {
             extrusionAutonymus = true;
             ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             //snapping
-            ex.setTargetPosition((ex.getCurrentPosition() - FIRST_LEVEL_HEIGHT - BOTTOM_SNAP) / CLEARENCE + FIRST_LEVEL_HEIGHT);
+            ex.setTargetPosition((ex.getCurrentPosition() - FIRST_LEVEL_HEIGHT - BOTTOM_SNAP) / LEVEL_HEIGHT + FIRST_LEVEL_HEIGHT);
             ex.setPower(EXTRUSION_POWER);
         }
     }
@@ -265,13 +267,15 @@ public class TeleOp {
         }
     }
 
-    public void nextLevel(){
-
+    public void extrudeToLevel(){
+        //controls for extruding at level
+        if(g2.y){
+            ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            ex.setTargetPosition(level * LEVEL_HEIGHT + FIRST_LEVEL_HEIGHT);
+            ex.setPower(EXTRUSION_POWER);
+        }
     }
 
-    public void downResetLevel(){
-
-    }
 
     public int testExtrusion(){
         ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
