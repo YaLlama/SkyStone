@@ -36,6 +36,12 @@ public class TeleOp {
     static final double BUILD_UNCLAPED_LEFT = 0;
     static final double BUILD_UNCLAPED_RIGHT = 0;
 
+    //the speed at which the joystick moves the rotating servo
+    static final double JOYSITCK_SPEED = .1;
+
+    //the spead at which the dpad moves the servo
+    static final double DEPAD_SPEED = .01;
+
 
     private static DcMotor leftFront;
     private static DcMotor rightFront;
@@ -83,6 +89,8 @@ public class TeleOp {
     double ry;
 
     static int level = 0;
+
+    static boolean released = true;
 
 
     public TeleOp(DcMotor extrusion, Gamepad gamepad1, Gamepad gamePad2, DcMotor lf, DcMotor lb, DcMotor rb, DcMotor rf, Servo clampServo, Servo rotateServo, DcMotor intakeLeft, DcMotor intakeRight, Servo buildLeft, Servo buildRight){
@@ -185,13 +193,13 @@ public class TeleOp {
         //Control for moving clamping servos
         if(g2.left_stick_x > DEAD_ZONE && ((g2.left_stick_x > 0 && ex.getCurrentPosition() < MAX_ROTATION) || (g2.left_stick_x < 0 && ex.getCurrentPosition() > MINIMUM_ROTATION))) {
             placingAutonymus = false;
-            rs.setPosition(rs.getPosition() + g2.left_stick_x * .1);
+            rs.setPosition(rs.getPosition() + g2.left_stick_x * JOYSITCK_SPEED);
         }else if(g2.dpad_right){
             placingAutonymus = false;
-            rs.setPosition(rs.getPosition() + .1);
+            rs.setPosition(rs.getPosition() + DEPAD_SPEED);
         }else if(g2.dpad_left){
             placingAutonymus = false;
-            rs.setPosition(rs.getPosition() - .1);
+            rs.setPosition(rs.getPosition() - DEPAD_SPEED);
         }
     }
 
@@ -273,6 +281,102 @@ public class TeleOp {
             ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             ex.setTargetPosition(level * LEVEL_HEIGHT + FIRST_LEVEL_HEIGHT);
             ex.setPower(EXTRUSION_POWER);
+        }
+    }
+
+    public void increseLevel(){
+        //controls for increasing level
+        if(g2.dpad_up && released){
+            level++;
+            released = true;
+        }
+    }
+
+    public void decreaseLevel(){
+        //controls for decreasing level
+        if(g2.dpad_down && released && level > 0){
+            level--;
+            released = false;
+        }else{
+            released = true;
+        }
+    }
+
+    public String getLevel(){
+        switch(level){
+            case 0:
+                return "   _____           \n" +
+                        " /       \\  \n" +
+                        "|  \\      | \n" +
+                        "|    \\    | \n" +
+                        "|      \\  | \n" +
+                        " \\ _____ /       \n"
+                        ;
+            case 1:
+                return "     __          \n" +
+                        "   /   |        \n" +
+                        "  /    |        \n" +
+                        "       |        \n" +
+                        "       |        \n" +
+                        "  _____|__   \n"
+                        ;
+            case 2:
+                return "     ____    \n" +
+                        "    /    |   \n" +
+                        "        /     \n" +
+                        "      /        \n" +
+                        "    /           \n" +
+                        "   |______  \n"
+                        ;
+            case 3:
+                return "   _______         \n" +
+                        "  /      / \n" +
+                        "        /   \n" +
+                        "        \\   \n" +
+                        "         \\ \n" +
+                        "  \\_______\\     \n"
+                        ;
+            case 4:
+                return "|       |\n" +
+                        "|_______|      \n" +
+                        "        |\n" +
+                        "        |\n" +
+                        "        |\n" +
+                        "        |\n"
+                        ;
+            case 5:
+                return " ______     \n" +
+                        "/            \n" +
+                        "\\____       \n" +
+                        "     \\     \n" +
+                        "      |      \n" +
+                        "_____/       \n"
+                        ;
+            case 6:
+                return "    ____        \n" +
+                        "  /          \n" +
+                        " /_____       \n" +
+                        "|      \\    \n" +
+                        "|       |    \n" +
+                        " \\_____/\n"
+                        ;
+            case 7:
+                return "_______\n" +
+                        "       /\n" +
+                        "      /\n" +
+                        "    /\n" +
+                        "   /\n" +
+                        "  /\n"
+                        ;
+            case 8:
+                return "   _____     \n" +
+                        " /       \\    \n" +
+                        "| _______ |    \n" +
+                        "|         |    \n" +
+                        "|         |      \n" +
+                        " \\ _____ /      \n";
+            default:
+                return Integer.toString(level);
         }
     }
 

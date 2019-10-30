@@ -41,6 +41,7 @@ public class TeleOpTesting extends OpMode {
         ex = new TeleOp(extusion, gamepad1, gamepad2, leftFront, leftBack, rightBack, rightFront, clampServo, rotationServo, intakeLeft, intakeRight, buildLeft, buildRight);
         telemetry.addData("initailized: ", true);
         telemetry.addData("Extrusion: ", ex.testExtrusion());
+        telemetry.addData("Level:", ex.getLevel());
         telemetry.update();
     }
 
@@ -55,6 +56,9 @@ public class TeleOpTesting extends OpMode {
         ex.placeBlockManual();
         ex.intakeManual();
         ex.resetExtrusion();
+        ex.extrudeToLevel();
+        ex.increseLevel();
+        ex.decreaseLevel();
         telemetry.update();
     }
 }
