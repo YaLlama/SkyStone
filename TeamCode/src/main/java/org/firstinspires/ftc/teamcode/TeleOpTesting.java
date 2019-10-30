@@ -39,6 +39,9 @@ public class TeleOpTesting extends OpMode {
         buildRight = hardwareMap.servo.get("buildRight");
 
         ex = new TeleOp(extusion, gamepad1, gamepad2, leftFront, leftBack, rightBack, rightFront, clampServo, rotationServo, intakeLeft, intakeRight, buildLeft, buildRight);
+        telemetry.addData("initailized: ", true);
+        telemetry.addData("Extrusion: ", ex.testExtrusion());
+        telemetry.update();
     }
 
     @Override
@@ -52,5 +55,6 @@ public class TeleOpTesting extends OpMode {
         ex.placeBlockManual();
         ex.intakeManual();
         ex.resetExtrusion();
+        telemetry.update();
     }
 }

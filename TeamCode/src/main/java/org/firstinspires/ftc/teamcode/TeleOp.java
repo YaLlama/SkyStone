@@ -10,7 +10,7 @@ public class TeleOp {
     //highest encoder value extrusion can be
     static final int MAX_HEIGHT = 0;
     //Max extrusion motor power
-    static final double EXTRUSION_POWER = 0;
+    static final double EXTRUSION_POWER = .5;
 
     //amount in encoder tics below the snappin point the threshhold is
     static final int BOTTOM_SNAP = 0;
@@ -29,12 +29,12 @@ public class TeleOp {
     static final double CLOSED_POSSITION = 0;
 
     //clamping of build plate servo values
-    static final int BUILD_CLAPED_LEFT = 0;
-    static final int BUILD_CLAPED_RIGHT = 0;
+    static final double BUILD_CLAPED_LEFT = .35;
+    static final double BUILD_CLAPED_RIGHT = .4;
 
     //releasing/ default of build plate servos
-    static final int BUILD_UNCLAPED_LEFT = 0;
-    static final int BUILD_UNCLAPED_RIGHT = 0;
+    static final double BUILD_UNCLAPED_LEFT = 0;
+    static final double BUILD_UNCLAPED_RIGHT = 0;
 
 
     private static DcMotor leftFront;
@@ -98,6 +98,12 @@ public class TeleOp {
 
         bl = buildLeft;
         br = buildRight;
+
+        br.setDirection(Servo.Direction.FORWARD);
+        bl.setDirection(Servo.Direction.REVERSE);
+
+        bl.setPosition(BUILD_UNCLAPED_LEFT);
+        br.setPosition(BUILD_UNCLAPED_RIGHT);
 
         ir.setDirection(DcMotorSimple.Direction.REVERSE);
         il.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -164,7 +170,7 @@ public class TeleOp {
 
     public void extrusionAuto(){
         //control for locking to closest height
-        if(g2.x) {
+        if(g2.a) {
             extrusionAutonymus = true;
             ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             //snapping
@@ -177,7 +183,13 @@ public class TeleOp {
         //Control for moving clamping servos
         if(g2.left_stick_x > DEAD_ZONE && ((g2.left_stick_x > 0 && ex.getCurrentPosition() < MAX_ROTATION) || (g2.left_stick_x < 0 && ex.getCurrentPosition() > MINIMUM_ROTATION))) {
             placingAutonymus = false;
-            rs.setPosition(rs.getPosition() + g2.left_stick_y * .1);
+            rs.setPosition(rs.getPosition() + g2.left_stick_x * .1);
+        }else if(g2.dpad_right){
+            placingAutonymus = false;
+            rs.setPosition(rs.getPosition() + .1);
+        }else if(g2.dpad_left){
+            placingAutonymus = false;
+            rs.setPosition(rs.getPosition() - .1);
         }
     }
 
@@ -226,10 +238,10 @@ public class TeleOp {
 
     public void clampBuildPlate(){
         //clamping build plate controls
-        if(g1.right_bumper){
+        if(g1.left_trigger > 0.2){
             br.setPosition(BUILD_CLAPED_RIGHT);
             bl.setPosition(BUILD_CLAPED_LEFT);
-        }else if(g1.left_bumper){
+        }else{
             br.setPosition(BUILD_UNCLAPED_RIGHT);
             bl.setPosition(BUILD_UNCLAPED_LEFT);
         }
@@ -237,20 +249,33 @@ public class TeleOp {
 
     public void clampBlock(){
         //clmaping block controls
-        if(g2.left_bumper){
-            cs.setPosition(OPEN_POSSITION);
-        }else if(g2.right_bumper){
+        if(g2.left_bumper || g2.right_bumper){
             cs.setPosition(CLOSED_POSSITION);
+        }else if(g2.left_trigger > .2 || g2.right_trigger > .2){
+            cs.setPosition(OPEN_POSSITION);
         }
     }
     public void resetExtrusion(){
         //comntrol for resetting evertything
-        if(g1.a) {
+        if(g1.b) {
             ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             ex.setTargetPosition(0);
             ex.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             rs.setPosition(MINIMUM_ROTATION);
         }
+    }
+
+    public void nextLevel(){
+
+    }
+
+    public void downResetLevel(){
+
+    }
+
+    public int testExtrusion(){
+        ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        return ex.getCurrentPosition();
     }
 
 }
