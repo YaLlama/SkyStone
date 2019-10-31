@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
-public class TeleOp {
+public class IntakeOutakeDriving {
 
     //highest encoder value extrusion can be
     static final int MAX_HEIGHT = 0;
@@ -93,7 +93,7 @@ public class TeleOp {
     static boolean released = true;
 
 
-    public TeleOp(DcMotor extrusion, Gamepad gamepad1, Gamepad gamePad2, DcMotor lf, DcMotor lb, DcMotor rb, DcMotor rf, Servo clampServo, Servo rotateServo, DcMotor intakeLeft, DcMotor intakeRight, Servo buildLeft, Servo buildRight){
+    public IntakeOutakeDriving(DcMotor extrusion, Gamepad gamepad1, Gamepad gamePad2, DcMotor lf, DcMotor lb, DcMotor rb, DcMotor rf, Servo clampServo, Servo rotateServo, DcMotor intakeLeft, DcMotor intakeRight, Servo buildLeft, Servo buildRight){
         //Motors not reversed in any way except for intake
 
         ex = extrusion;
@@ -179,14 +179,11 @@ public class TeleOp {
     }
 
     public void extrusionAuto(){
-        //control for locking to closest height
-        if(g2.a) {
-            extrusionAutonymus = true;
-            ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            //snapping
-            ex.setTargetPosition((ex.getCurrentPosition() - FIRST_LEVEL_HEIGHT - BOTTOM_SNAP) / LEVEL_HEIGHT + FIRST_LEVEL_HEIGHT);
-            ex.setPower(EXTRUSION_POWER);
-        }
+        extrusionAutonymus = true;
+        ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //snapping
+        ex.setTargetPosition((ex.getCurrentPosition() - FIRST_LEVEL_HEIGHT - BOTTOM_SNAP) / LEVEL_HEIGHT + FIRST_LEVEL_HEIGHT);
+        ex.setPower(EXTRUSION_POWER);
     }
 
     public void placeBlockManual(){
@@ -203,11 +200,11 @@ public class TeleOp {
         }
     }
 
-    public void placeBlockAuto(){
+    public void placeBlockAuto(boolean placeBlock){
         //controls for automatically placing block, need to hold x
         step1done = false;
         step2done = false;
-        while(g1.x){
+        while(placeBlock){
             if(!step1done) {
                 rs.setPosition(MAX_ROTATION);
                 if (rs.getPosition() == MAX_ROTATION) {
@@ -246,52 +243,51 @@ public class TeleOp {
         }
     }
 
-    public void clampBuildPlate(){
+    public void intakeAuto(double intakeSpeed){
+        il.setPower(intakeSpeed);
+        ir.setPower(intakeSpeed);
+    }
+
+    public void clampBuildPlate(boolean Clamp, boolean Unclamp){
         //clamping build plate controls
-        if(g1.left_trigger > 0.2){
+        if(Clamp){
             br.setPosition(BUILD_CLAPED_RIGHT);
             bl.setPosition(BUILD_CLAPED_LEFT);
-        }else{
+        }else if(Unclamp){
             br.setPosition(BUILD_UNCLAPED_RIGHT);
             bl.setPosition(BUILD_UNCLAPED_LEFT);
         }
     }
 
-    public void clampBlock(){
+    public void clampBlock(boolean Clamp, boolean Unclamp){
         //clmaping block controls
-        if(g2.left_bumper || g2.right_bumper){
+        if(Clamp){
             cs.setPosition(CLOSED_POSSITION);
-        }else if(g2.left_trigger > .2 || g2.right_trigger > .2){
+        }else if(Unclamp){
             cs.setPosition(OPEN_POSSITION);
         }
     }
     public void resetExtrusion(){
-        //comntrol for resetting evertything
-        if(g1.b) {
-            ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            ex.setTargetPosition(0);
-            ex.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            rs.setPosition(MINIMUM_ROTATION);
-        }
+        ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        ex.setTargetPosition(0);
+        ex.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rs.setPosition(MINIMUM_ROTATION);
     }
 
     public void extrudeToLevel(){
-        //controls for extruding at level
-        if(g2.y){
-            ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            ex.setTargetPosition(level * LEVEL_HEIGHT + FIRST_LEVEL_HEIGHT);
-            ex.setPower(EXTRUSION_POWER);
-        }
+        ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        ex.setTargetPosition(level * LEVEL_HEIGHT + FIRST_LEVEL_HEIGHT);
+        ex.setPower(EXTRUSION_POWER);
     }
 
-    public void changeLevel(){
+    public void changeLevel(boolean levelUp, boolean levelDown){
         //controls for increasing level
-        if(g2.dpad_up && released){
+        if(levelUp && released && level < 8){
             level++;
             released = false;
         }
         //controls for decreasing level
-        else if(g2.dpad_down && released && level > 0){
+        else if(levelDown && released && level > 0){
             level--;
             released = false;
         }else{

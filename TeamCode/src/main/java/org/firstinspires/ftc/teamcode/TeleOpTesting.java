@@ -19,7 +19,7 @@ public class TeleOpTesting extends OpMode {
     Servo buildLeft;
     Servo buildRight;
 
-    TeleOp ex;
+    IntakeOutakeDriving ex;
 
     @Override
     public void init() {
@@ -38,7 +38,7 @@ public class TeleOpTesting extends OpMode {
         buildLeft = hardwareMap.servo.get("buildLeft");
         buildRight = hardwareMap.servo.get("buildRight");
 
-        ex = new TeleOp(extusion, gamepad1, gamepad2, leftFront, leftBack, rightBack, rightFront, clampServo, rotationServo, intakeLeft, intakeRight, buildLeft, buildRight);
+        ex = new IntakeOutakeDriving(extusion, gamepad1, gamepad2, leftFront, leftBack, rightBack, rightFront, clampServo, rotationServo, intakeLeft, intakeRight, buildLeft, buildRight);
         telemetry.addData("initailized: ", true);
         telemetry.addData("Extrusion: ", ex.testExtrusion());
         telemetry.addData("Level:", ex.getLevel());
@@ -48,17 +48,22 @@ public class TeleOpTesting extends OpMode {
     @Override
     public void loop() {
         ex.driving();
-        ex.clampBlock();
-        ex.clampBuildPlate();
-        ex.extrusionAuto();
+        ex.clampBlock(g2.left_bumper || g2.right_bumper, g2.left_trigger > .2 || g2.right_trigger > .2);
+        ex.clampBuildPlate(gamepad1.left_trigger > 0.2, gamepad1.left_bumper);
+        if(gamepad2.a){
+            ex.extrusionAuto();
+        }
         ex.extrusionManual();
-        ex.placeBlockAuto();
+        ex.placeBlockAuto(gamepad2.x);
         ex.placeBlockManual();
         ex.intakeManual();
-        ex.resetExtrusion();
-        ex.extrudeToLevel();
-        ex.increseLevel();
-        ex.decreaseLevel();
+        if(gamepad2.b) {
+            ex.resetExtrusion();
+        }
+        if(g2.y){
+            ex.extrudeToLevel();
+        }
+        ex.changeLevel(gamepad2.dpad_up, gamepad2.dpad_down);
         telemetry.update();
     }
 }
