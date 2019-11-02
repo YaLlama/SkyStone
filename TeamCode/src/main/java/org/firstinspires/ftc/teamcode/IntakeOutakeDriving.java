@@ -10,7 +10,7 @@ public class IntakeOutakeDriving {
     //highest encoder value extrusion can be
     static final int MAX_HEIGHT = 0;
     //Max extrusion motor power
-    static final double EXTRUSION_POWER = .5;
+    static final double EXTRUSION_POWER = 1;
 
     //amount in encoder tics below the snappin point the threshhold is
     static final int BOTTOM_SNAP = 0;
@@ -103,22 +103,35 @@ public class IntakeOutakeDriving {
         cs = clampServo;
         rs = rotateServo;
 
+        cs.setPosition(0);
+        rs.setPosition(0);
+
         ir = intakeRight;
         il = intakeLeft;
 
         bl = buildLeft;
         br = buildRight;
 
+        /*
         br.setDirection(Servo.Direction.FORWARD);
         bl.setDirection(Servo.Direction.REVERSE);
 
         bl.setPosition(BUILD_UNCLAPED_LEFT);
         br.setPosition(BUILD_UNCLAPED_RIGHT);
 
+         */
+
         ir.setDirection(DcMotorSimple.Direction.REVERSE);
         il.setDirection(DcMotorSimple.Direction.FORWARD);
 
+
+
+        ex.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        ex.setDirection(DcMotorSimple.Direction.REVERSE);
+
         ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
 
         rightBack = rb;
         rightFront = rf;
@@ -133,13 +146,16 @@ public class IntakeOutakeDriving {
         il.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         ir.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
+
         il.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         ir.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
 
 
     }
@@ -373,9 +389,13 @@ public class IntakeOutakeDriving {
     }
 
 
-    public int testExtrusion(){
+    public int getExtrusion(){
         ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         return ex.getCurrentPosition();
+    }
+
+    public void stuff(){
+        ex.setPower(-g1.left_stick_y);
     }
 
 }

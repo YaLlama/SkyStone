@@ -1,14 +1,16 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
+@Autonomous(name = "testTeleOP")
 public class TeleOpTesting extends OpMode {
 
-    DcMotor leftFront;
-    DcMotor rightFront;
-    DcMotor leftBack;
+    DcMotor leftEncoder;
+    DcMotor rightEncoder;
+    DcMotor backEncoder;
     DcMotor rightBack;
     DcMotor extusion;
     DcMotor intakeLeft;
@@ -23,9 +25,9 @@ public class TeleOpTesting extends OpMode {
 
     @Override
     public void init() {
-        leftFront = hardwareMap.dcMotor.get("leftFront");
-        rightFront = hardwareMap.dcMotor.get("rightFront");
-        leftBack = hardwareMap.dcMotor.get("leftBack");
+        leftEncoder = hardwareMap.dcMotor.get("leftEncoder");
+        rightEncoder = hardwareMap.dcMotor.get("rightEncoder");
+        backEncoder = hardwareMap.dcMotor.get("backEncoder");
         rightBack = hardwareMap.dcMotor.get("rightBack");
         extusion = hardwareMap.dcMotor.get("extrusion");
 
@@ -35,20 +37,24 @@ public class TeleOpTesting extends OpMode {
         intakeLeft = hardwareMap.dcMotor.get("intakeLeft");
         intakeRight = hardwareMap.dcMotor.get("intakeRight");
 
+        /*
         buildLeft = hardwareMap.servo.get("buildLeft");
         buildRight = hardwareMap.servo.get("buildRight");
 
-        ex = new IntakeOutakeDriving(extusion, gamepad1, gamepad2, leftFront, leftBack, rightBack, rightFront, clampServo, rotationServo, intakeLeft, intakeRight, buildLeft, buildRight);
+         */
+
+        ex = new IntakeOutakeDriving(extusion, gamepad1, gamepad2, leftEncoder, backEncoder, rightBack, rightEncoder, clampServo, rotationServo, intakeLeft, intakeRight, buildLeft, buildRight);
         telemetry.addData("initailized: ", true);
-        telemetry.addData("Extrusion: ", ex.testExtrusion());
+        telemetry.addData("Extrusion: ", extusion.getCurrentPosition());
         telemetry.addData("Level:", ex.getLevel());
         telemetry.update();
     }
 
     @Override
     public void loop() {
+        /*
         ex.driving();
-        ex.clampBlock(g2.left_bumper || g2.right_bumper, g2.left_trigger > .2 || g2.right_trigger > .2);
+        ex.clampBlock(gamepad2.left_bumper || gamepad2.right_bumper, gamepad2.left_trigger > .2 || gamepad2.right_trigger > .2);
         ex.clampBuildPlate(gamepad1.left_trigger > 0.2, gamepad1.left_bumper);
         if(gamepad2.a){
             ex.extrusionAuto();
@@ -64,6 +70,9 @@ public class TeleOpTesting extends OpMode {
             ex.extrudeToLevel();
         }
         ex.changeLevel(gamepad2.dpad_up, gamepad2.dpad_down);
+         */
+        ex.stuff();
+        telemetry.addData("EX", ex.getExtrusion());
         telemetry.update();
     }
 }
