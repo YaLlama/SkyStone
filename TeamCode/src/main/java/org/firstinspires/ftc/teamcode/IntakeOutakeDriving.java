@@ -13,26 +13,26 @@ public class IntakeOutakeDriving {
     static final double EXTRUSION_POWER = 1;
 
     //height of extrusion to pick up block
-    static final int BLOCK_HEIGHT = 0;
+    static final int BLOCK_HEIGHT = 475;
 
     //height of primed extrusion
-    static final int EXTRUSION_PRIME = 0;
+    static final int EXTRUSION_PRIME = 600;
 
     //amount in encoder tics below the snappin point the threshhold is
-    static final int BOTTOM_SNAP = 0;
+    static final int BOTTOM_SNAP = 200;
 
     //joystick dead zone
     static final double DEAD_ZONE = 0;
 
     //servo max and min
     static final double MAX_ROTATION = 0;
-    static final double MINIMUM_ROTATION = 0;
+    static final double MINIMUM_ROTATION = .72;
 
     //open position of clamping servo
-    static final double OPEN_POSSITION = 0;
+    static final double OPEN_POSSITION = .6;
 
     //closed prosition of clamping servo
-    static final double CLOSED_POSSITION = 0;
+    static final double CLOSED_POSSITION = .35;
 
     //clamping of build plate servo values
     static final double BUILD_CLAPED_LEFT = .35;
@@ -71,16 +71,16 @@ public class IntakeOutakeDriving {
 
 
     //encoder value with first block placed perfectly on build plate
-    public static final int FIRST_LEVEL_HEIGHT = 0;
+    public static final int FIRST_LEVEL_HEIGHT = 350;
 
     //the amount of encoder tics between levels
-    public static final int LEVEL_HEIGHT = 0;
+    public static final int LEVEL_HEIGHT = 300;
 
     //the encoder amount it needs to be lowered in order to lock block into place
-    public static final int LOCKED_POSITION = 0;
+    public static final int LOCKED_POSITION = 150;
 
     //servo primed possition
-    public static final double SERVO_PRIME = 0;
+    public static final double SERVO_PRIME = MAX_ROTATION;
 
 
 
@@ -112,8 +112,10 @@ public class IntakeOutakeDriving {
         cs = clampServo;
         rs = rotateServo;
 
-        cs.setPosition(0);
-        rs.setPosition(0);
+        cs.setDirection(Servo.Direction.FORWARD);
+        rs.setDirection(Servo.Direction.FORWARD);
+        cs.setPosition(OPEN_POSSITION);
+        rs.setPosition(MINIMUM_ROTATION);
 
         ir = intakeRight;
         il = intakeLeft;
@@ -155,7 +157,6 @@ public class IntakeOutakeDriving {
         il.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         ir.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -195,10 +196,10 @@ public class IntakeOutakeDriving {
     public void extrusionManual(){
         //Control for moving extrusion up
 
-        if(Math.abs(g1.left_stick_y) > DEAD_ZONE && ((-g1.left_stick_y > 0 && ex.getCurrentPosition() < MAX_HEIGHT) || (-g1.left_stick_y < 0 && ex.getCurrentPosition() > FIRST_LEVEL_HEIGHT))) {
+        if(Math.abs(g2.left_stick_y) > DEAD_ZONE && ((-g2.left_stick_y > 0 && ex.getCurrentPosition() < MAX_HEIGHT) || (-g2.left_stick_y < 0 && ex.getCurrentPosition() > 0))) {
             ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             extrusionAutonymus = false;
-            ex.setPower(-g1.left_stick_y);
+            ex.setPower(-g2.left_stick_y);
         }else if(!extrusionAutonymus){
             ex.setPower(0);
         }
@@ -214,15 +215,12 @@ public class IntakeOutakeDriving {
 
     public void placeBlockManual(){
         //Control for moving clamping servos
-        if(g2.left_stick_x > DEAD_ZONE && ((g2.left_stick_x > 0 && ex.getCurrentPosition() < MAX_ROTATION) || (g2.left_stick_x < 0 && ex.getCurrentPosition() > MINIMUM_ROTATION))) {
+        if(g2.dpad_right){
             placingAutonymus = false;
-            rs.setPosition(rs.getPosition() + g2.left_stick_x * JOYSITCK_SPEED);
-        }else if(g2.dpad_right){
-            placingAutonymus = false;
-            rs.setPosition(rs.getPosition() + DEPAD_SPEED);
+            rs.setPosition(MINIMUM_ROTATION);
         }else if(g2.dpad_left){
             placingAutonymus = false;
-            rs.setPosition(rs.getPosition() - DEPAD_SPEED);
+            rs.setPosition(MAX_ROTATION);
         }
     }
 
@@ -258,9 +256,9 @@ public class IntakeOutakeDriving {
 
     public void intakeManual(){
         //intake controls
-        if(Math.abs(g1.right_stick_x) > DEAD_ZONE || Math.abs(g1.right_stick_y) > DEAD_ZONE){
-            rx = .3 * g1.right_stick_x;
-            ry = -g1.right_stick_y;
+        if(Math.abs(g2.right_stick_x) > DEAD_ZONE || Math.abs(g2.right_stick_y) > DEAD_ZONE){
+            rx = .3 * g2.right_stick_x;
+            ry = -g2.right_stick_y;
             il.setPower(ry + rx);
             ir.setPower(ry - rx);
         }else{
