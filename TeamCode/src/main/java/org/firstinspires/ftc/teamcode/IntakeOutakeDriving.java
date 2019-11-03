@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class IntakeOutakeDriving {
 
     //highest encoder value extrusion can be
-    static final int MAX_HEIGHT = 0;
+    static final int MAX_HEIGHT = 2300;
     //Max extrusion motor power
     static final double EXTRUSION_POWER = 1;
 
@@ -121,14 +121,14 @@ public class IntakeOutakeDriving {
 
          */
 
-        ir.setDirection(DcMotorSimple.Direction.REVERSE);
-        il.setDirection(DcMotorSimple.Direction.FORWARD);
+        ir.setDirection(DcMotorSimple.Direction.FORWARD);
+        il.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
 
         ex.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        ex.setDirection(DcMotorSimple.Direction.REVERSE);
+        ex.setDirection(DcMotorSimple.Direction.FORWARD);
 
         ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -152,6 +152,7 @@ public class IntakeOutakeDriving {
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
+        ex.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         il.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         ir.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -185,10 +186,10 @@ public class IntakeOutakeDriving {
     public void extrusionManual(){
         //Control for moving extrusion up
 
-        if(g2.left_stick_y > DEAD_ZONE && ((-g2.left_stick_y > 0 && ex.getCurrentPosition() < MAX_HEIGHT) || (-g2.left_stick_y < 0 && ex.getCurrentPosition() > FIRST_LEVEL_HEIGHT))){
+        if(Math.abs(g1.left_stick_y) > DEAD_ZONE && ((-g1.left_stick_y > 0 && ex.getCurrentPosition() < MAX_HEIGHT) || (-g1.left_stick_y < 0 && ex.getCurrentPosition() > FIRST_LEVEL_HEIGHT))) {
             ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             extrusionAutonymus = false;
-            ex.setPower(-g2.left_stick_y);
+            ex.setPower(-g1.left_stick_y);
         }else if(!extrusionAutonymus){
             ex.setPower(0);
         }
@@ -196,9 +197,9 @@ public class IntakeOutakeDriving {
 
     public void extrusionAuto(){
         extrusionAutonymus = true;
-        ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         //snapping
         ex.setTargetPosition((ex.getCurrentPosition() - FIRST_LEVEL_HEIGHT - BOTTOM_SNAP) / LEVEL_HEIGHT + FIRST_LEVEL_HEIGHT);
+        ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         ex.setPower(EXTRUSION_POWER);
     }
 
@@ -224,8 +225,9 @@ public class IntakeOutakeDriving {
             if(!step1done) {
                 rs.setPosition(MAX_ROTATION);
                 if (rs.getPosition() == MAX_ROTATION) {
-                    ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
                     ex.setTargetPosition(ex.getCurrentPosition() - LOCKED_POSITION);
+                    ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     step1done = true;
                 }
             }
@@ -247,9 +249,9 @@ public class IntakeOutakeDriving {
 
     public void intakeManual(){
         //intake controls
-        if(Math.abs(g2.right_stick_x) > DEAD_ZONE || Math.abs(g2.right_stick_y) > DEAD_ZONE){
-            rx = g2.right_stick_x;
-            ry = -g2.right_stick_y;
+        if(Math.abs(g1.right_stick_x) > DEAD_ZONE || Math.abs(g1.right_stick_y) > DEAD_ZONE){
+            rx = .3 * g1.right_stick_x;
+            ry = -g1.right_stick_y;
             il.setPower(ry + rx);
             ir.setPower(ry - rx);
         }else{
@@ -283,15 +285,17 @@ public class IntakeOutakeDriving {
         }
     }
     public void resetExtrusion(){
-        ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
         ex.setTargetPosition(0);
+        ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         ex.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rs.setPosition(MINIMUM_ROTATION);
     }
 
     public void extrudeToLevel(){
-        ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
         ex.setTargetPosition(level * LEVEL_HEIGHT + FIRST_LEVEL_HEIGHT);
+        ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         ex.setPower(EXTRUSION_POWER);
     }
 
@@ -395,7 +399,12 @@ public class IntakeOutakeDriving {
     }
 
     public void stuff(){
-        ex.setPower(-g1.left_stick_y);
+        if(g1.left_stick_y != 0) {
+            ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            ex.setPower(-g1.left_stick_y);
+        }else {
+            ex.setPower(0);
+        }
     }
 
 }

@@ -71,7 +71,8 @@ public class TeleOpTesting extends OpMode {
         }
         ex.changeLevel(gamepad2.dpad_up, gamepad2.dpad_down);
          */
-        ex.stuff();
+        ex.extrusionManual();
+        ex.intakeManual();
         telemetry.addData("EX", ex.getExtrusion());
         telemetry.update();
     }
