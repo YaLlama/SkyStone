@@ -54,7 +54,7 @@ public class TeleOpTesting extends OpMode {
     public void loop() {
         /*
         ex.driving();
-        ex.clampBlock(gamepad2.left_bumper || gamepad2.right_bumper, gamepad2.left_trigger > .2 || gamepad2.right_trigger > .2);
+        ex.clampBlock(gamepad2.left_bumper, gamepad2.left_trigger > .2);
         ex.clampBuildPlate(gamepad1.left_trigger > 0.2, gamepad1.left_bumper);
         if(gamepad2.a){
             ex.extrusionAuto();

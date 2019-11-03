@@ -12,6 +12,12 @@ public class IntakeOutakeDriving {
     //Max extrusion motor power
     static final double EXTRUSION_POWER = 1;
 
+    //height of extrusion to pick up block
+    static final int BLOCK_HEIGHT = 0;
+
+    //height of primed extrusion
+    static final int EXTRUSION_PRIME = 0;
+
     //amount in encoder tics below the snappin point the threshhold is
     static final int BOTTOM_SNAP = 0;
 
@@ -72,6 +78,9 @@ public class IntakeOutakeDriving {
 
     //the encoder amount it needs to be lowered in order to lock block into place
     public static final int LOCKED_POSITION = 0;
+
+    //servo primed possition
+    public static final double SERVO_PRIME = 0;
 
 
 
@@ -282,6 +291,23 @@ public class IntakeOutakeDriving {
             cs.setPosition(CLOSED_POSSITION);
         }else if(Unclamp){
             cs.setPosition(OPEN_POSSITION);
+        }
+    }
+
+    public void blockHeight(boolean primed){
+        if(primed){
+            ex.setTargetPosition(BLOCK_HEIGHT);
+            ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            ex.setPower(EXTRUSION_POWER);
+        }
+    }
+
+    public void prime(boolean primed){
+        if(primed){
+            ex.setTargetPosition(EXTRUSION_PRIME);
+            ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            ex.setPower(EXTRUSION_POWER);
+            rs.setPosition(SERVO_PRIME);
         }
     }
     public void resetExtrusion(){
