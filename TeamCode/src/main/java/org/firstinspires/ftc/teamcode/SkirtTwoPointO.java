@@ -72,8 +72,13 @@ public class SkirtTwoPointO {
         return (int) (d / WHEEL_CIRCUMFRENCE * MOTOR_TICK_COUNT * GEER_RATIO);
     }
 
-    public void move(int x, int y, double power, int threshholdPerAxiz) {
+    public void move(int x, int y, double power, int threshholdPerAxiz, int rotationThreshhold) {
         // x and y are distances in encoder tics
+
+        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -126,14 +131,18 @@ public class SkirtTwoPointO {
             rightBack.setPower(PowerRB);
             leftBack.setPower(PowerLB);
 
-            if (rightFront.getCurrentPosition() + rightBack.getCurrentPosition() == leftBack.getCurrentPosition() + leftFront.getCurrentPosition()) {
-
+            if (Math.abs(rightFront.getCurrentPosition() + rightBack.getCurrentPosition() - (leftBack.getCurrentPosition() + leftFront.getCurrentPosition())) > rotationThreshhold) {
+                leftFront.setPower(PowerLF);
+                rightFront.setPower(PowerRF);
+                rightBack.setPower(PowerRB);
+                leftBack.setPower(PowerLB);
             } else if (rightFront.getCurrentPosition() + rightBack.getCurrentPosition() < leftBack.getCurrentPosition() + leftFront.getCurrentPosition()) {
                 rightFront.setPower(PowerRF + correction);
                 rightBack.setPower(PowerRB + correction);
 
                 PowerRF = PowerRF + correction;
                 PowerRB = PowerRB + correction;
+
             } else {
                 leftBack.setPower(PowerLB + correction);
                 leftFront.setPower(PowerLF + correction);
@@ -142,7 +151,18 @@ public class SkirtTwoPointO {
                 PowerLF = PowerLF + correction;
             }
         }
-
+        while(rightFront.getCurrentPosition() + rightBack.getCurrentPosition() < leftBack.getCurrentPosition() + leftFront.getCurrentPosition()){
+            PowerRF = correction;
+            PowerRB = correction;
+            PowerLB = -correction;
+            PowerLF = -correction;
+        }
+        while(rightFront.getCurrentPosition() + rightBack.getCurrentPosition() > leftBack.getCurrentPosition() + leftFront.getCurrentPosition()){
+            PowerRF = -correction;
+            PowerRB = -correction;
+            PowerLB = correction;
+            PowerLF = correction;
+        }
 
         //stops everything
         leftFront.setPower(0);
