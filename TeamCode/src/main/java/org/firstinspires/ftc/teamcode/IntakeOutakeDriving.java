@@ -215,7 +215,7 @@ public class IntakeOutakeDriving {
         }
     }
 
-    public void extrusionAuto(){
+    public void extrusionAuto(int DO_NOT_USE){
         extrusionAutonymus = true;
         //snapping
         ex.setTargetPosition((ex.getCurrentPosition() - FIRST_LEVEL_HEIGHT - BOTTOM_SNAP) / LEVEL_HEIGHT + FIRST_LEVEL_HEIGHT);
@@ -311,13 +311,11 @@ public class IntakeOutakeDriving {
 
     public void blockHeight(boolean primed){
         if(primed) {
-            extrusionAutonymus = true;
-            if(releasedblockHeight){
+            if(releasedblockHeight) {
+                extrusionAutonymus = true;
                 targetPossition = BLOCK_HEIGHT;
                 ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 ex.setPower(EXTRUSION_POWER / 3);
-            }else if(targetPossition <= ex.getCurrentPosition()){
-                ex.setPower(0);
             }
             releasedblockHeight = false;
         }else{
@@ -327,15 +325,12 @@ public class IntakeOutakeDriving {
 
     public void prime(boolean primed){
         if(primed) {
-            extrusionAutonymus = true;
             if(releasedprime) {
+                extrusionAutonymus = true;
                 targetPossition = EXTRUSION_PRIME;
                 ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 ex.setPower(EXTRUSION_POWER / 3);
                 rs.setPosition(SERVO_PRIME);
-            }
-            else if(targetPossition <= ex.getCurrentPosition()){
-                ex.setPower(0);
             }
             releasedprime = false;
         }else{
@@ -344,13 +339,11 @@ public class IntakeOutakeDriving {
     }
     public void resetExtrusion(boolean reset, boolean bottom){
         if(reset) {
-            extrusionAutonymus = true;
             rs.setPosition(MINIMUM_ROTATION);
             ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             ex.setPower(-EXTRUSION_POWER);
         }
         if(bottom){
-            extrusionAutonymus = false;
             ex.setPower(0);
             ex.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
@@ -358,18 +351,14 @@ public class IntakeOutakeDriving {
 
     public void extrudeToLevel(boolean extend){
         if(extend) {
-            extrusionAutonymus = true;
             if(releasedextrudeToLevel) {
+                extrusionAutonymus = true;
                 targetPossition = -(level * LEVEL_HEIGHT + FIRST_LEVEL_HEIGHT);
                 ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 ex.setPower(EXTRUSION_POWER);
                 rs.setPosition(MAX_ROTATION);
             }
             releasedextrudeToLevel = false;
-
-            if(targetPossition <= ex.getCurrentPosition()){
-                ex.setPower(0);
-            }
         }else{
             releasedextrudeToLevel = true;
         }
@@ -479,7 +468,7 @@ public class IntakeOutakeDriving {
     }
 
     public void catchExtruision(){
-        if(targetPossition <= ex.getCurrentPosition()) {
+        if(targetPossition <= ex.getCurrentPosition() && extrusionAutonymus) {
             ex.setPower(0);
             extrusionAutonymus = false;
         }
