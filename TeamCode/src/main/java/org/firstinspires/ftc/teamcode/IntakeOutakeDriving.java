@@ -101,6 +101,8 @@ public class IntakeOutakeDriving {
 
     static boolean released = true;
 
+    static int targetPossition = 0;
+
 
     public IntakeOutakeDriving(DcMotor extrusion, Gamepad gamepad1, Gamepad gamePad2, DcMotor lf, DcMotor lb, DcMotor rb, DcMotor rf, Servo clampServo, Servo rotateServo, DcMotor intakeLeft, DcMotor intakeRight, Servo buildLeft, Servo buildRight){
         //Motors not reversed in any way except for intake
@@ -308,31 +310,44 @@ public class IntakeOutakeDriving {
             rs.setPosition(SERVO_PRIME);
         }
     }
-    public void resetExtrusion(){
-
-        ex.setTargetPosition(0);
-        ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        ex.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rs.setPosition(MINIMUM_ROTATION);
+    public void resetExtrusion(boolean reset, boolean bottom){
+        if(reset) {
+            rs.setPosition(MINIMUM_ROTATION);
+            ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            ex.setPower(-EXTRUSION_POWER);
+        }
+        if(bottom){
+            ex.setPower(0);
+            ex.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
     }
 
-    public void extrudeToLevel(){
-
-        ex.setTargetPosition(level * LEVEL_HEIGHT + FIRST_LEVEL_HEIGHT);
-        ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        ex.setPower(EXTRUSION_POWER);
+    public void extrudeToLevel(boolean extend){
+        if(extend) {
+            targetPossition = level * LEVEL_HEIGHT + FIRST_LEVEL_HEIGHT;
+            ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            ex.setPower(-EXTRUSION_POWER);
+        }
+        if(targetPossition > ex.getCurrentPosition()){
+            ex.setPower(0);
+            targetPossition = 0;
+        }
     }
 
     public void changeLevel(boolean levelUp, boolean levelDown){
         //controls for increasing level
-        if(levelUp && released && level < 8){
-            level++;
-            released = false;
+        if(levelUp){
+            if(released && level < 8) {
+                level++;
+                released = false;
+            }
         }
         //controls for decreasing level
-        else if(levelDown && released && level > 0){
-            level--;
-            released = false;
+        else if(levelDown){
+            if(released && level > 0) {
+                level--;
+                released = false;
+            }
         }else{
             released = true;
         }
