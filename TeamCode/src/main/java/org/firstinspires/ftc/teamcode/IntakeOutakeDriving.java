@@ -99,9 +99,15 @@ public class IntakeOutakeDriving {
 
     static int level = 0;
 
-    static boolean released = true;
+    static boolean releasedchangeLevel = true;
 
     static int targetPossition = 0;
+
+    static boolean releasedblockHeight = true;
+
+    static boolean releasedprime = true;
+
+    static boolean releasedextrudeToLevel = true;
 
 
     public IntakeOutakeDriving(DcMotor extrusion, Gamepad gamepad1, Gamepad gamePad2, DcMotor lf, DcMotor lb, DcMotor rb, DcMotor rf, Servo clampServo, Servo rotateServo, DcMotor intakeLeft, DcMotor intakeRight, Servo buildLeft, Servo buildRight){
@@ -228,29 +234,31 @@ public class IntakeOutakeDriving {
 
     public void placeBlockAuto(boolean placeBlock){
         //controls for automatically placing block, need to hold x
-        step1done = false;
-        step2done = false;
-        while(placeBlock){
+        if(placeBlock){
             if(!step1done) {
                 rs.setPosition(MAX_ROTATION);
                 if (rs.getPosition() == MAX_ROTATION) {
-
-                    ex.setTargetPosition(ex.getCurrentPosition() - LOCKED_POSITION);
-                    ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    targetPossition = targetPossition - LOCKED_POSITION;
+                    ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    ex.setPower(-EXTRUSION_POWER / 3);
                     step1done = true;
                 }
             }
             else if(!step2done) {
-                if (ex.getCurrentPosition() == ex.getTargetPosition()) {
+                if (ex.getCurrentPosition() <= targetPossition) {
+                    ex.setPower(0);
                     cs.setPosition(OPEN_POSSITION);
                     if(cs.getPosition() == OPEN_POSSITION){
-                        ex.setTargetPosition(ex.getCurrentPosition() + LOCKED_POSITION);
+                        targetPossition = targetPossition + 2 * LOCKED_POSITION;
+                        ex.setPower(EXTRUSION_POWER / 3);
                         step2done = true;
                     }
                 }
             }else{
-                if(ex.getCurrentPosition() == ex.getTargetPosition()){
-                    break;
+                if(ex.getCurrentPosition() >= targetPossition){
+                    ex.setPower(0);
+                    step1done = false;
+                    step2done = false;
                 }
             }
         }
@@ -295,19 +303,34 @@ public class IntakeOutakeDriving {
     }
 
     public void blockHeight(boolean primed){
-        if(primed){
-            ex.setTargetPosition(BLOCK_HEIGHT);
-            ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            ex.setPower(EXTRUSION_POWER);
+        if(primed) {
+            if(releasedblockHeight){
+                targetPossition = BLOCK_HEIGHT;
+                ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                ex.setPower(EXTRUSION_POWER / 3);
+            }else if(targetPossition <= ex.getCurrentPosition()){
+                ex.setPower(0);
+            }
+            releasedblockHeight = false;
+        }else{
+            releasedblockHeight = true;
         }
     }
 
     public void prime(boolean primed){
-        if(primed){
-            ex.setTargetPosition(EXTRUSION_PRIME);
-            ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            ex.setPower(EXTRUSION_POWER);
-            rs.setPosition(SERVO_PRIME);
+        if(primed) {
+            if(releasedprime) {
+                targetPossition = EXTRUSION_PRIME;
+                ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                ex.setPower(EXTRUSION_POWER / 3);
+                rs.setPosition(SERVO_PRIME);
+            }
+            else if(targetPossition <= ex.getCurrentPosition()){
+                ex.setPower(0);
+            }
+            releasedprime = false;
+        }else{
+            releasedprime = true;
         }
     }
     public void resetExtrusion(boolean reset, boolean bottom){
@@ -324,32 +347,37 @@ public class IntakeOutakeDriving {
 
     public void extrudeToLevel(boolean extend){
         if(extend) {
-            targetPossition = level * LEVEL_HEIGHT + FIRST_LEVEL_HEIGHT;
-            ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            ex.setPower(-EXTRUSION_POWER);
-        }
-        if(targetPossition > ex.getCurrentPosition()){
-            ex.setPower(0);
-            targetPossition = 0;
+            if(releasedextrudeToLevel) {
+                targetPossition = level * LEVEL_HEIGHT + FIRST_LEVEL_HEIGHT;
+                ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                ex.setPower(EXTRUSION_POWER);
+                rs.setPosition(MAX_ROTATION);
+            }
+            if(targetPossition < ex.getCurrentPosition()){
+                ex.setPower(0);
+            }
+            releasedextrudeToLevel = false;
+        }else{
+            releasedextrudeToLevel = true;
         }
     }
 
     public void changeLevel(boolean levelUp, boolean levelDown){
         //controls for increasing level
         if(levelUp){
-            if(released && level < 8) {
+            if(releasedchangeLevel && level < 8) {
                 level++;
-                released = false;
+                releasedchangeLevel = false;
             }
         }
         //controls for decreasing level
         else if(levelDown){
-            if(released && level > 0) {
+            if(releasedchangeLevel && level > 0) {
                 level--;
-                released = false;
+                releasedchangeLevel = false;
             }
         }else{
-            released = true;
+            releasedchangeLevel = true;
         }
     }
 
