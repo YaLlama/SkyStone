@@ -1,32 +1,38 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.TeleOp;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
-public class TeleOp {
+public class IntakeOutakeDriving {
 
     //highest encoder value extrusion can be
-    static final int MAX_HEIGHT = 0;
+    static final int MAX_HEIGHT = 2300;
     //Max extrusion motor power
-    static final double EXTRUSION_POWER = .5;
+    static final double EXTRUSION_POWER = 1;
+
+    //height of extrusion to pick up block
+    static final int BLOCK_HEIGHT = 475;
+
+    //height of primed extrusion
+    static final int EXTRUSION_PRIME = 600;
 
     //amount in encoder tics below the snappin point the threshhold is
-    static final int BOTTOM_SNAP = 0;
+    static final int BOTTOM_SNAP = 200;
 
     //joystick dead zone
     static final double DEAD_ZONE = 0;
 
     //servo max and min
     static final double MAX_ROTATION = 0;
-    static final double MINIMUM_ROTATION = 0;
+    static final double MINIMUM_ROTATION = .72;
 
     //open position of clamping servo
-    static final double OPEN_POSSITION = 0;
+    static final double OPEN_POSSITION = .6;
 
     //closed prosition of clamping servo
-    static final double CLOSED_POSSITION = 0;
+    static final double CLOSED_POSSITION = .35;
 
     //clamping of build plate servo values
     static final double BUILD_CLAPED_LEFT = .35;
@@ -65,13 +71,16 @@ public class TeleOp {
 
 
     //encoder value with first block placed perfectly on build plate
-    public static final int FIRST_LEVEL_HEIGHT = 0;
+    public static final int FIRST_LEVEL_HEIGHT = 350;
 
     //the amount of encoder tics between levels
-    public static final int LEVEL_HEIGHT = 0;
+    public static final int LEVEL_HEIGHT = 300;
 
     //the encoder amount it needs to be lowered in order to lock block into place
-    public static final int LOCKED_POSITION = 0;
+    public static final int LOCKED_POSITION = 150;
+
+    //servo primed possition
+    public static final double SERVO_PRIME = MAX_ROTATION;
 
 
 
@@ -90,10 +99,20 @@ public class TeleOp {
 
     static int level = 0;
 
-    static boolean released = true;
+    static boolean releasedchangeLevel = true;
+
+    static int targetPossition = 0;
+
+    static boolean releasedblockHeight = true;
+
+    static boolean releasedprime = true;
+
+    static boolean releasedextrudeToLevel = true;
+
+    static boolean releasedplaceBlockAuto = true;
 
 
-    public TeleOp(DcMotor extrusion, Gamepad gamepad1, Gamepad gamePad2, DcMotor lf, DcMotor lb, DcMotor rb, DcMotor rf, Servo clampServo, Servo rotateServo, DcMotor intakeLeft, DcMotor intakeRight, Servo buildLeft, Servo buildRight){
+    public IntakeOutakeDriving(DcMotor extrusion, Gamepad gamepad1, Gamepad gamePad2, DcMotor lf, DcMotor lb, DcMotor rb, DcMotor rf, Servo clampServo, Servo rotateServo, DcMotor intakeLeft, DcMotor intakeRight, Servo buildLeft, Servo buildRight){
         //Motors not reversed in any way except for intake
 
         ex = extrusion;
@@ -103,22 +122,37 @@ public class TeleOp {
         cs = clampServo;
         rs = rotateServo;
 
+        cs.setDirection(Servo.Direction.FORWARD);
+        rs.setDirection(Servo.Direction.FORWARD);
+        cs.setPosition(OPEN_POSSITION);
+        rs.setPosition(MINIMUM_ROTATION);
+
         ir = intakeRight;
         il = intakeLeft;
 
         bl = buildLeft;
         br = buildRight;
 
+        /*
         br.setDirection(Servo.Direction.FORWARD);
         bl.setDirection(Servo.Direction.REVERSE);
 
         bl.setPosition(BUILD_UNCLAPED_LEFT);
         br.setPosition(BUILD_UNCLAPED_RIGHT);
 
-        ir.setDirection(DcMotorSimple.Direction.REVERSE);
-        il.setDirection(DcMotorSimple.Direction.FORWARD);
+         */
+
+        ir.setDirection(DcMotorSimple.Direction.FORWARD);
+        il.setDirection(DcMotorSimple.Direction.REVERSE);
+
+
+
+        ex.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        ex.setDirection(DcMotorSimple.Direction.FORWARD);
 
         ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
 
         rightBack = rb;
         rightFront = rf;
@@ -138,8 +172,11 @@ public class TeleOp {
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
+        ex.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         il.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         ir.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
 
 
     }
@@ -169,7 +206,7 @@ public class TeleOp {
     public void extrusionManual(){
         //Control for moving extrusion up
 
-        if(g2.left_stick_y > DEAD_ZONE && ((-g2.left_stick_y > 0 && ex.getCurrentPosition() < MAX_HEIGHT) || (-g2.left_stick_y < 0 && ex.getCurrentPosition() > FIRST_LEVEL_HEIGHT))){
+        if(Math.abs(g2.left_stick_y) > DEAD_ZONE && ((-g2.left_stick_y > 0 && ex.getCurrentPosition() < MAX_HEIGHT) || (-g2.left_stick_y < 0 && ex.getCurrentPosition() > 0))) {
             ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             extrusionAutonymus = false;
             ex.setPower(-g2.left_stick_y);
@@ -178,65 +215,66 @@ public class TeleOp {
         }
     }
 
-    public void extrusionAuto(){
-        //control for locking to closest height
-        if(g2.a) {
-            extrusionAutonymus = true;
-            ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            //snapping
-            ex.setTargetPosition((ex.getCurrentPosition() - FIRST_LEVEL_HEIGHT - BOTTOM_SNAP) / LEVEL_HEIGHT + FIRST_LEVEL_HEIGHT);
-            ex.setPower(EXTRUSION_POWER);
-        }
+    public void extrusionAuto(int DO_NOT_USE){
+        extrusionAutonymus = true;
+        //snapping
+        ex.setTargetPosition((ex.getCurrentPosition() - FIRST_LEVEL_HEIGHT - BOTTOM_SNAP) / LEVEL_HEIGHT + FIRST_LEVEL_HEIGHT);
+        ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        ex.setPower(EXTRUSION_POWER);
     }
 
     public void placeBlockManual(){
         //Control for moving clamping servos
-        if(g2.left_stick_x > DEAD_ZONE && ((g2.left_stick_x > 0 && ex.getCurrentPosition() < MAX_ROTATION) || (g2.left_stick_x < 0 && ex.getCurrentPosition() > MINIMUM_ROTATION))) {
+        if(g2.dpad_right){
             placingAutonymus = false;
-            rs.setPosition(rs.getPosition() + g2.left_stick_x * JOYSITCK_SPEED);
-        }else if(g2.dpad_right){
-            placingAutonymus = false;
-            rs.setPosition(rs.getPosition() + DEPAD_SPEED);
+            rs.setPosition(MINIMUM_ROTATION);
         }else if(g2.dpad_left){
             placingAutonymus = false;
-            rs.setPosition(rs.getPosition() - DEPAD_SPEED);
+            rs.setPosition(MAX_ROTATION);
         }
     }
 
-    public void placeBlockAuto(){
+    public void placeBlockAuto(boolean placeBlock){
         //controls for automatically placing block, need to hold x
-        step1done = false;
-        step2done = false;
-        while(g1.x){
+        if(placeBlock){
+            releasedplaceBlockAuto = false;
             if(!step1done) {
                 rs.setPosition(MAX_ROTATION);
                 if (rs.getPosition() == MAX_ROTATION) {
-                    ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    ex.setTargetPosition(ex.getCurrentPosition() - LOCKED_POSITION);
+                    targetPossition = targetPossition - LOCKED_POSITION;
+                    ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    ex.setPower(-EXTRUSION_POWER / 3);
                     step1done = true;
                 }
             }
             else if(!step2done) {
-                if (ex.getCurrentPosition() == ex.getTargetPosition()) {
+                if (ex.getCurrentPosition() <= targetPossition) {
+                    ex.setPower(0);
                     cs.setPosition(OPEN_POSSITION);
                     if(cs.getPosition() == OPEN_POSSITION){
-                        ex.setTargetPosition(ex.getCurrentPosition() + LOCKED_POSITION);
+                        targetPossition = targetPossition + 2 * LOCKED_POSITION;
+                        ex.setPower(EXTRUSION_POWER / 3);
                         step2done = true;
                     }
                 }
             }else{
-                if(ex.getCurrentPosition() == ex.getTargetPosition()){
-                    break;
+                if(ex.getCurrentPosition() >= targetPossition){
+                    ex.setPower(0);
+                    step1done = false;
+                    step2done = false;
                 }
             }
-
+        }else if(!releasedplaceBlockAuto){
+            step1done = false;
+            step2done = false;
+            releasedplaceBlockAuto = true;
         }
     }
 
     public void intakeManual(){
         //intake controls
         if(Math.abs(g2.right_stick_x) > DEAD_ZONE || Math.abs(g2.right_stick_y) > DEAD_ZONE){
-            rx = g2.right_stick_x;
+            rx = .3 * g2.right_stick_x;
             ry = -g2.right_stick_y;
             il.setPower(ry + rx);
             ir.setPower(ry - rx);
@@ -246,56 +284,102 @@ public class TeleOp {
         }
     }
 
-    public void clampBuildPlate(){
+    public void intakeAuto(double intakeSpeed){
+        il.setPower(intakeSpeed);
+        ir.setPower(intakeSpeed);
+    }
+
+    public void clampBuildPlate(boolean Clamp, boolean Unclamp){
         //clamping build plate controls
-        if(g1.left_trigger > 0.2){
+        if(Clamp){
             br.setPosition(BUILD_CLAPED_RIGHT);
             bl.setPosition(BUILD_CLAPED_LEFT);
-        }else{
+        }else if(Unclamp){
             br.setPosition(BUILD_UNCLAPED_RIGHT);
             bl.setPosition(BUILD_UNCLAPED_LEFT);
         }
     }
 
-    public void clampBlock(){
+    public void clampBlock(boolean Clamp, boolean Unclamp){
         //clmaping block controls
-        if(g2.left_bumper || g2.right_bumper){
+        if(Clamp){
             cs.setPosition(CLOSED_POSSITION);
-        }else if(g2.left_trigger > .2 || g2.right_trigger > .2){
+        }else if(Unclamp){
             cs.setPosition(OPEN_POSSITION);
         }
     }
-    public void resetExtrusion(){
-        //comntrol for resetting evertything
-        if(g1.b) {
-            ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            ex.setTargetPosition(0);
-            ex.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+    public void blockHeight(boolean primed){
+        if(primed) {
+            if(releasedblockHeight) {
+                extrusionAutonymus = true;
+                targetPossition = BLOCK_HEIGHT;
+                ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                ex.setPower(EXTRUSION_POWER / 3);
+            }
+            releasedblockHeight = false;
+        }else{
+            releasedblockHeight = true;
+        }
+    }
+
+    public void prime(boolean primed){
+        if(primed) {
+            if(releasedprime) {
+                extrusionAutonymus = true;
+                targetPossition = EXTRUSION_PRIME;
+                ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                ex.setPower(EXTRUSION_POWER / 3);
+                rs.setPosition(SERVO_PRIME);
+            }
+            releasedprime = false;
+        }else{
+            releasedprime = true;
+        }
+    }
+    public void resetExtrusion(boolean reset, boolean bottom){
+        if(reset) {
             rs.setPosition(MINIMUM_ROTATION);
+            ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            ex.setPower(-EXTRUSION_POWER);
+        }
+        if(bottom){
+            ex.setPower(0);
+            ex.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
     }
 
-    public void extrudeToLevel(){
-        //controls for extruding at level
-        if(g2.y){
-            ex.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            ex.setTargetPosition(level * LEVEL_HEIGHT + FIRST_LEVEL_HEIGHT);
-            ex.setPower(EXTRUSION_POWER);
+    public void extrudeToLevel(boolean extend){
+        if(extend) {
+            if(releasedextrudeToLevel) {
+                extrusionAutonymus = true;
+                targetPossition = -(level * LEVEL_HEIGHT + FIRST_LEVEL_HEIGHT);
+                ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                ex.setPower(EXTRUSION_POWER);
+                rs.setPosition(MAX_ROTATION);
+            }
+            releasedextrudeToLevel = false;
+        }else{
+            releasedextrudeToLevel = true;
         }
     }
 
-    public void changeLevel(){
+    public void changeLevel(boolean levelUp, boolean levelDown){
         //controls for increasing level
-        if(g2.dpad_up && released){
-            level++;
-            released = false;
+        if(levelUp){
+            if(releasedchangeLevel && level < 8) {
+                level++;
+                releasedchangeLevel = false;
+            }
         }
         //controls for decreasing level
-        else if(g2.dpad_down && released && level > 0){
-            level--;
-            released = false;
+        else if(levelDown){
+            if(releasedchangeLevel && level > 0) {
+                level--;
+                releasedchangeLevel = false;
+            }
         }else{
-            released = true;
+            releasedchangeLevel = true;
         }
     }
 
@@ -378,9 +462,49 @@ public class TeleOp {
     }
 
 
-    public int testExtrusion(){
+    public int getExtrusion(){
         ex.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         return ex.getCurrentPosition();
     }
+
+    public void catchExtruision(){
+        if(targetPossition <= ex.getCurrentPosition() && extrusionAutonymus) {
+            ex.setPower(0);
+            extrusionAutonymus = false;
+        }
+    }
+
+    public void testMotors(){
+        leftFront.setPower(.3);
+        sleep(1000);
+        leftFront.setPower(0);
+        rightFront.setPower(.3);
+        sleep(1000);
+        rightFront.setPower(0);
+        rightBack.setPower(.3);
+        sleep(1000);
+        rightBack.setPower(0);
+        leftBack.setPower(.3);
+        sleep(1000);
+        leftBack.setPower(0);
+    }
+
+    public int[] getOdometry(){
+        int[] odometry = {0, 0, 0};
+        odometry[0] = leftFront.getCurrentPosition();
+        odometry[1] = rightFront.getCurrentPosition();
+        odometry[2] = leftBack.getCurrentPosition();
+        return odometry;
+    }
+
+
+    public void sleep(int sleep){
+        try{
+            wait(sleep);
+        }catch(Exception e){
+
+        }
+    }
+
 
 }
