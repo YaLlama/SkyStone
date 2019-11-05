@@ -474,4 +474,37 @@ public class IntakeOutakeDriving {
         }
     }
 
+    public void testMotors(){
+        leftFront.setPower(.3);
+        sleep(1000);
+        leftFront.setPower(0);
+        rightFront.setPower(.3);
+        sleep(1000);
+        rightFront.setPower(0);
+        rightBack.setPower(.3);
+        sleep(1000);
+        rightBack.setPower(0);
+        leftBack.setPower(.3);
+        sleep(1000);
+        leftBack.setPower(0);
+    }
+
+    public int[] getOdometry(){
+        int[] odometry = {0, 0, 0};
+        odometry[0] = leftFront.getCurrentPosition();
+        odometry[1] = rightFront.getCurrentPosition();
+        odometry[2] = leftBack.getCurrentPosition();
+        return odometry;
+    }
+
+
+    public void sleep(int sleep){
+        try{
+            wait(sleep);
+        }catch(Exception e){
+
+        }
+    }
+
+
 }

@@ -44,7 +44,9 @@ public class TeleOpTesting extends OpMode {
          */
 
         ex = new IntakeOutakeDriving(extusion, gamepad1, gamepad2, leftEncoder, backEncoder, rightBack, rightEncoder, clampServo, rotationServo, intakeLeft, intakeRight, buildLeft, buildRight);
+        //DcMotor lf, DcMotor lb, DcMotor rb, DcMotor rf
         telemetry.addData("initailized: ", true);
+        ex.testMotors();
         telemetry.addData("Extrusion: ", extusion.getCurrentPosition());
         telemetry.addData("Level:", ex.getLevel());
         telemetry.update();
@@ -83,6 +85,9 @@ public class TeleOpTesting extends OpMode {
         ex.placeBlockAuto(gamepad2.x);
         ex.extrudeToLevel(gamepad2.a);
         ex.changeLevel(gamepad2.dpad_up, gamepad2.dpad_down);
+        telemetry.addData("Left Front", ex.getOdometry()[0]);
+        telemetry.addData("Right Front", ex.getOdometry()[1]);
+        telemetry.addData("Back", ex.getOdometry()[2]);
         telemetry.addData("EX", ex.getExtrusion());
         telemetry.addData("Level:", ex.getLevel());
         telemetry.update();
