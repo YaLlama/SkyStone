@@ -178,7 +178,7 @@ public class SKRTOdometry {
 
             odo.updateOdometry();
 
-            //if no horizontal movement is necessary
+
             if(DisY < 0){
                 disP = -power;
             }else{
