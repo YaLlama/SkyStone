@@ -102,8 +102,8 @@ public class AutoMovementKaden {
     public void StrafeToPointOrient(double DesiredX, double DesiredY, double DesiredHeading, double XYThreshold, double HeadingThreshold, double Power){
 
         //creating variablkes for possition
-        double currentX = odometryCenter.getCurrentPosition() * odoPodCenterDirectionalScale;
-        double currentY = (odoemtryLeft.getCurrentPosition() * odoPodLeftDirectionalScale) + (odometryRight.getCurrentPosition() * odoPodRightDirectionalScale);
+        double currentX = 0;
+        double currentY = 0;
         double currentHeading = getImuHeading();
 
         //creating seperate power variable that can be changed without affecting other programs
@@ -116,11 +116,6 @@ public class AutoMovementKaden {
         double fractionalPower;
 
         while((Math.abs(DesiredHeading - currentHeading) > HeadingThreshold || Math.abs(DesiredX - currentX) > XYThreshold || Math.abs(DesiredY - currentY) > XYThreshold) && opMode.opModeIsActive()){ //keep moving untiol in desired position or program is stopped
-
-            //updating possition
-            currentX = odometryCenter.getCurrentPosition() * odoPodCenterDirectionalScale;
-            currentY = (odoemtryLeft.getCurrentPosition() * odoPodLeftDirectionalScale) + (odometryRight.getCurrentPosition() * odoPodRightDirectionalScale);
-            currentHeading = getImuHeading();
 
             while(Math.abs(DesiredHeading - currentHeading) > HeadingThreshold){ //while not at desired heading
 
@@ -139,15 +134,17 @@ public class AutoMovementKaden {
                     motorRightFront.setPower(-Power);
 
                 }
-                //reset odometry t
-                odoemtryLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                odometryRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                odometryCenter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                odoemtryLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                odometryRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                odometryCenter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             }
-            while(Math.abs(DesiredX - currentX) > XYThreshold || Math.abs(DesiredY - currentY) > XYThreshold){ //while not at desired x or y
+
+            //reset odometry that way rotating doesnt affect location
+            odoemtryLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            odometryRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            odometryCenter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            odoemtryLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            odometryRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            odometryCenter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            if(Math.abs(DesiredX - currentX) > XYThreshold || Math.abs(DesiredY - currentY) > XYThreshold){ //while not at desired x or y
 
                 if(DesiredY - currentY > 0){ // if the desired point is infront of the robot
                     powerDirection = Power;
@@ -185,6 +182,13 @@ public class AutoMovementKaden {
 
                 }
             }
+
+            //updating possition
+            currentX += odometryCenter.getCurrentPosition() * odoPodCenterDirectionalScale;
+            currentY += (odoemtryLeft.getCurrentPosition() * odoPodLeftDirectionalScale) + (odometryRight.getCurrentPosition() * odoPodRightDirectionalScale);
+            currentHeading = getImuHeading();
+
+
         }
 
         //stops everything when reached desired possition
