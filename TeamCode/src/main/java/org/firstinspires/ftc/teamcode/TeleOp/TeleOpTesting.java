@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -44,7 +44,9 @@ public class TeleOpTesting extends OpMode {
          */
 
         ex = new IntakeOutakeDriving(extusion, gamepad1, gamepad2, leftEncoder, backEncoder, rightBack, rightEncoder, clampServo, rotationServo, intakeLeft, intakeRight, buildLeft, buildRight);
+        //DcMotor lf, DcMotor lb, DcMotor rb, DcMotor rf
         telemetry.addData("initailized: ", true);
+        ex.testMotors();
         telemetry.addData("Extrusion: ", extusion.getCurrentPosition());
         telemetry.addData("Level:", ex.getLevel());
         telemetry.update();
@@ -54,7 +56,7 @@ public class TeleOpTesting extends OpMode {
     public void loop() {
         /*
         ex.driving();
-        ex.clampBlock(gamepad2.left_bumper || gamepad2.right_bumper, gamepad2.left_trigger > .2 || gamepad2.right_trigger > .2);
+        ex.clampBlock(gamepad2.left_bumper, gamepad2.left_trigger > .2);
         ex.clampBuildPlate(gamepad1.left_trigger > 0.2, gamepad1.left_bumper);
         if(gamepad2.a){
             ex.extrusionAuto();
@@ -71,9 +73,23 @@ public class TeleOpTesting extends OpMode {
         }
         ex.changeLevel(gamepad2.dpad_up, gamepad2.dpad_down);
          */
+        ex.prime(gamepad2.right_bumper);
+        ex.catchExtruision();
+        ex.blockHeight(gamepad2.right_trigger > .2);
+        ex.placeBlockManual();
+        ex.clampBlock(gamepad2.left_bumper, gamepad2.left_trigger > .2);
+        ex.driving();
+        ex.resetExtrusion(gamepad2.b, extusion.getCurrentPosition() <= 0);
         ex.extrusionManual();
         ex.intakeManual();
+        ex.placeBlockAuto(gamepad2.x);
+        ex.extrudeToLevel(gamepad2.a);
+        ex.changeLevel(gamepad2.dpad_up, gamepad2.dpad_down);
+        telemetry.addData("Left Front", ex.getOdometry()[0]);
+        telemetry.addData("Right Front", ex.getOdometry()[1]);
+        telemetry.addData("Back", ex.getOdometry()[2]);
         telemetry.addData("EX", ex.getExtrusion());
+        telemetry.addData("Level:", ex.getLevel());
         telemetry.update();
     }
 }
