@@ -106,6 +106,14 @@ public class AutoMovementKaden {
         double currentY = 0;
         double currentHeading = getImuHeading();
 
+        //reset odometry so possition is 0,0
+        odoemtryLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        odometryRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        odometryCenter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        odoemtryLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        odometryRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        odometryCenter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         //creating seperate power variable that can be changed without affecting other programs
         double powerDirection;
 
@@ -116,34 +124,6 @@ public class AutoMovementKaden {
         double fractionalPower;
 
         while((Math.abs(DesiredHeading - currentHeading) > HeadingThreshold || Math.abs(DesiredX - currentX) > XYThreshold || Math.abs(DesiredY - currentY) > XYThreshold) && opMode.opModeIsActive()){ //keep moving untiol in desired position or program is stopped
-
-            while(Math.abs(DesiredHeading - currentHeading) > HeadingThreshold){ //while not at desired heading
-
-                if((int)(DesiredHeading - currentHeading) % 360 < 180){ //if we want to rotate counter clockwise
-                    //rotate counter clockwise
-                    motorLeftBack.setPower(-Power);
-                    motorLeftFront.setPower(-Power);
-                    motorRightBack.setPower(Power);
-                    motorRightFront.setPower(Power);
-
-                }else{ // if we want to rotate clockwise
-                    //rotate clockwise
-                    motorLeftBack.setPower(Power);
-                    motorLeftFront.setPower(Power);
-                    motorRightBack.setPower(-Power);
-                    motorRightFront.setPower(-Power);
-
-                }
-            }
-
-            //reset odometry that way rotating doesnt affect location
-            odoemtryLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            odometryRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            odometryCenter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            odoemtryLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            odometryRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            odometryCenter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
             if(Math.abs(DesiredX - currentX) > XYThreshold || Math.abs(DesiredY - currentY) > XYThreshold){ //while not at desired x or y
 
                 if(DesiredY - currentY > 0){ // if the desired point is infront of the robot
@@ -179,15 +159,38 @@ public class AutoMovementKaden {
                         motorRightBack.setPower(powerDirection * fractionalPower);
                         motorRightFront.setPower(powerDirection);
                     }
+                }
+                //updating possition
+                currentX += odometryCenter.getCurrentPosition() * odoPodCenterDirectionalScale;
+                currentY += (odoemtryLeft.getCurrentPosition() * odoPodLeftDirectionalScale) + (odometryRight.getCurrentPosition() * odoPodRightDirectionalScale);
+                currentHeading = getImuHeading();
+            }
+            while(Math.abs(DesiredHeading - currentHeading) > HeadingThreshold){ //while not at desired heading
+
+                if((int)(DesiredHeading - currentHeading) % 360 < 180){ //if we want to rotate counter clockwise
+                    //rotate counter clockwise
+                    motorLeftBack.setPower(-Power);
+                    motorLeftFront.setPower(-Power);
+                    motorRightBack.setPower(Power);
+                    motorRightFront.setPower(Power);
+
+                }else{ // if we want to rotate clockwise
+                    //rotate clockwise
+                    motorLeftBack.setPower(Power);
+                    motorLeftFront.setPower(Power);
+                    motorRightBack.setPower(-Power);
+                    motorRightFront.setPower(-Power);
 
                 }
             }
 
-            //updating possition
-            currentX += odometryCenter.getCurrentPosition() * odoPodCenterDirectionalScale;
-            currentY += (odoemtryLeft.getCurrentPosition() * odoPodLeftDirectionalScale) + (odometryRight.getCurrentPosition() * odoPodRightDirectionalScale);
-            currentHeading = getImuHeading();
-
+            //reset odometry
+            odoemtryLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            odometryRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            odometryCenter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            odoemtryLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            odometryRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            odometryCenter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         }
 
